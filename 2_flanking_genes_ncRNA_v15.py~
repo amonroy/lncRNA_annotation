@@ -1,8 +1,8 @@
 ### TODO today (todays notes to myself)
-## working to reorganize this script so its more functional, and easier to read
+#
 #work on quality control
 
-### TODO (notes to myself)(come back to this)
+### TODO (notes to myself)
 # this is not finished! stuck as to what to do with ncRNA and genes after; what's my output; have a basic idea
 # need to do something to keep track of "quality"
 # need to make sure all information we need is accessible
@@ -25,7 +25,7 @@
 
 
 ### STARTING MATERIALS:
-#parsed down gff3 file. gff3 file from flybase (in "flybase" folder). Parse script, called "1_parse_gff3.py", using output from script called "1_dmel_genes_ncRNA_2016-06-07_out.txt"
+#parsed down gff3 file from script 1, called " ", found " "
 
 #need sys to read argv (ie. to read in modified gff3 file from command line)
 #
@@ -41,9 +41,7 @@
 
 
 import sys
-import datetime
 
-today = datetime.date.today()
 mod_gff3 = sys.argv[1]
 flyname = sys.argv[3]
 
