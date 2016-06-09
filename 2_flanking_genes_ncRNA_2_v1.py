@@ -46,14 +46,10 @@ import datetime
 today = datetime.date.today()
 mod_gff3 = sys.argv[1]
 flyname = sys.argv[3]
-
-#this window length (how many upstream and downstream genes) can change
-window_length = 4 #normally two, changing it to 3 for now (many genes don't have up and down)
-# 4 doesn't work, something going on at line 88
-
+#argv[2] somewhere around line 180
 
 #creating object "out" that I will write, 'w' too
-ncRNA_flank = open ('2_out_%s_flanking_genes_ncRNA.txt' %flyname, 'w')
+ncRNA_flank = open ('2_out_%s_flanking_genes_ncRNA_%s.txt' %(flyname, today), 'w')
 
 
 # initiating dictionaries:
@@ -70,7 +66,11 @@ fbgn_id_dict = {}
 #initiating ncRNA list
 ncRNA = []
 
-#def? make_gff_list
+#this window length (how many upstream and downstream genes) can change
+window_length = 4 #normally two, changing it to 3 for now (many genes don't have up and down)
+# 4 doesn't work, something going on at line 88
+#### I don't know if I fixed this
+
 #opening the file sys[1] as f
 with open (mod_gff3, 'r') as f:
 	#making gff_list of each line, which is also a list, so I end with a list of lists, this is most efficient way that I know how to do this.
@@ -80,9 +80,8 @@ with open (mod_gff3, 'r') as f:
 	#gff_list ex/:
 	#[['2L', 'FlyBase', 'gene', '7529', '9484', '.', '+', '.', 'ID=FBgn0031208;Name=CG11023;Ontology_term=SO:0000010,SO:0000087,GO:0016929,GO:0016926;Dbxref=FlyBase:FBan0011023,FlyBase_Annotation_IDs:CG11023,GB_protein:ACZ94128,GB_protein:AAO41164,GB:AI944728,GB:AJ564667,GB_protein:CAD92822,GB:BF495604,UniProt/TrEMBL:Q86BM6,INTERPRO:IPR003653,GB_protein:AGB92323,UniProt/TrEMBL:M9PAY1,OrthoDB7_Drosophila:EOG796K1P,OrthoDB7_Diptera:EOG7X1604,EntrezGene:33155,UniProt/TrEMBL:E1JHP8,UniProt/TrEMBL:Q6KEV3,OrthoDB7_Insecta:EOG7Q8QM7,OrthoDB7_Arthropoda:EOG7R5K68,OrthoDB7_Metazoa:EOG7D59MP,InterologFinder:33155,BIOGRID:59420,FlyAtlas:CG11023-RA,GenomeRNAi:33155;gbunit=AE014134;derived_computed_cyto=21A5-21A5'], 
 	# ['2L', 'FlyBase', 'gene', '9839', '21376', '.', '-', '.', 'ID=FBgn0002121;Name=l(2)gl;fullname=lethal (2) giant larvae;Alias=Lgl,lgl,lethal giant larvae,lethal giant larve,lethal giant larva,lethal(2)giant larvae,Complementation group 2.1,Lethal Giant Larvae,dlgl,p127l(2)gl,LGL,l(2) giant larva,CG2671,L(2)GL,p127,l(2)giant larvae,D-LGL,l(2),gl,l[[2]]gl,l-gl,lethal-giant-larvae,Lethal giant larvae,Lethal (2) giant larvae,L(2)gl,Lethal (2) giant larva,Lethal-giant-larvae,MENE (2L)-B,lethal(2) giant larvae,p127[l(2)gl],lethal(2)-giant larvae,lethal-2-giant larvae,l(2) giant larvae,lethal- giant-larvae,Lethal(2)giant larvae,Lethal-2-giant larvae;Ontology_term=SO:0000010,SO:0000087,GO:0005578,GO:0005886,GO:0007269,GO:0016082,GO:0008021,GO:0008283,GO:0016334,GO:0016336,GO:0016333,GO:0016335,GO:0016327,GO:0005829,GO:0045175,GO:0016332,GO:0045184,GO:0007399,GO:0005938,GO:0005737,GO:0007179,GO:0045197,GO:0045196,GO:0002009,GO:0005918,GO:0008105,GO:0045167,GO:0008104,GO:0045746,GO:0007423,GO:0008285,GO:0001738,GO:0016323,GO:0007391,GO:0005856,GO:0030154,GO:0042127,GO:0005614,GO:0045159,GO:0035072,GO:0007559,GO:0045200,GO:0008360,GO:0019991,GO:0007406,GO:0051726,GO:0051668,GO:0007314,GO:0016325,GO:0030036,GO:0030863,GO:0035070,GO:0055059,GO:0035212,GO:0035293,GO:0090163,GO:0048730,GO:0000132,GO:0098725,GO:0060429,GO:0007293,GO:0045176,GO:0072697,GO:0000149,SO:0000548,GO:0005920,GO:0017022,GO:0004860,GO:0006469;Dbxref=FlyBase:FBan0002671,FlyBase_Annotation_IDs:CG2671,INTERPRO:IPR015943,GB_protein:AAN10503,GB_protein:AAG22256,GB_protein:AAN10502,GB_protein:AAN10501,GB_protein:AAF51570,GB_protein:AAG22255,INTERPRO:IPR017986,GB:AA246243,GB:AW942062,GB:AY051654,GB_protein:AAK93078,GB:BH809482,GB:CZ471313,GB:CZ482024,GB:CZ484691,GB:M17022,GB_protein:AAA28671,GB_protein:AAA28672,GB:X05426,GB_protein:CAA29007,UniProt/Swiss-Prot:P08111,INTERPRO:IPR000664,INTERPRO:IPR001680,INTERPRO:IPR013577,GB_protein:AGB92324,UniProt/TrEMBL:M9NCX1,UniProt/TrEMBL:M9PBJ2,OrthoDB7_Drosophila:EOG7CW2GT,OrthoDB7_Diptera:EOG7DRVK2,GB_protein:AFH03479,GB_protein:AFH03478,GB_protein:AFH03481,GB_protein:AFH03480,EntrezGene:33156,INTERPRO:IPR013905,BDGP_clone:PC00404,OrthoDB7_Insecta:EOG7SRGKH,OrthoDB7_Arthropoda:EOG7ZDD82,OrthoDB7_Metazoa:EOG79W94C,InterologFinder:33156,FlyAtlas:CG2671-RB,BIOGRID:59421,Fly-FISH:CG2671,GenomeRNAi:33156,INTERACTIVEFLY:/cytoskel/lethl2g1.htm;gbunit=AE014134;derived_computed_cyto=21A5-21A5'], 
-	# ['2L', 'FlyBase', 'gene', '21823', '25155', '.', '-', '.', 'ID=FBgn0031209;Name=Ir21a;fullname=Ionotropic receptor 21a;Alias=CT8983,IR21a,CG2657,DmelIR21a,ionotropic receptor 21a,ir21a;Ontology_term=SO:0000010,SO:0000087,GO:0015276,GO:0016021,GO:0050907,GO:0004970,GO:0016020;Dbxref=FlyBase:FBan0002657,FlyBase_Annotation_IDs:CG2657,GB_protein:AAF51569,GB:CZ468165,UniProt/TrEMBL:Q9VPI2,INTERPRO:IPR001320,OrthoDB7_Drosophila:EOG77MN6S,OrthoDB7_Diptera:EOG725R0H,EntrezGene:33157,OrthoDB7_Insecta:EOG7GZ19M,FlyAtlas:Stencil:2L:25151:23928:GENSCAN%3BCG2657-RA,GenomeRNAi:33157;gbunit=AE014134;derived_computed_cyto=21A5-21B1'], ['2L', 'FlyBase', 'gene', '21952', '24237', '.', '+', '.', 'ID=FBgn0263584;Name=CR43609;Ontology_term=SO:0000011,SO:0000087,SO:0000077;Dbxref=FlyBase_Annotation_IDs:CR43609,EntrezGene:12797867,GenomeRNAi:12797867;derived_computed_cyto=21A5-21B1'], ['2L', 'FlyBase', 'ncRNA', '21952', '24237', '.', '+', '.', 'ID=FBtr0309810;Name=CR43609-RA;Parent=FBgn0263584;Dbxref=FlyBase_Annotation_IDs:CR43609-RA,REFSEQ:NR_047865;score_text=Strongly Supported;score=9'], ['2L', 'FlyBase', 'gene', '25402', '65404', '.', '-', '.', 'ID=FBgn0051973;Name=Cda5;fullname=Chitin deacetylase-like 5;Alias=FBgn0031210,FBgn0031211,FBgn0063656,CG2761,CG2776,BcDNA:RH43162,DmCDA5,CG31973;Ontology_term=SO:0000010,SO:0000087,GO:0005975,GO:0006030,GO:0016810,GO:0005576,GO:0008061,SO:0000548;Dbxref=FlyBase:FBan0031973,FlyBase_Annotation_IDs:CG31973,GB_protein:AAF51567,GB_protein:ABI31281,GB_protein:AAF51568,GB:AY129461,GB_protein:AAM76203,GB:BI613902,GB:CZ468962,GB:CZ486696,GB:CZ486697,UniProt/TrEMBL:Q9VPI3,UniProt/TrEMBL:Q9VPI4,INTERPRO:IPR002509,INTERPRO:IPR002557,INTERPRO:IPR011330,UniProt/TrEMBL:M9NEJ4,UniProt/TrEMBL:M9NCL3,UniProt/TrEMBL:M9NE36,UniProt/TrEMBL:M9NCX5,OrthoDB7_Drosophila:EOG72GCS8,OrthoDB7_Diptera:EOG7WHTSK,GB_protein:AFH03484,GB_protein:AFH03485,GB_protein:AFH03483,GB_protein:ABV53594,GB_protein:AFH03482,EntrezGene:33158,UniProt/TrEMBL:Q0E8V4,UniProt/TrEMBL:A8DYS5,BDGP_clone:RH43162,UniProt/TrEMBL:Q8MQI4,OrthoDB7_Insecta:EOG7F877T,OrthoDB7_Arthropoda:EOG713694,OrthoDB7_Metazoa:EOG7JHM4H,InterologFinder:33158,BIOGRID:59423,FlyAtlas:CG31973-RA,GenomeRNAi:33158;gbunit=AE014134;derived_compute
-
-#def making ncRNA_list	
+	
+	
 	#making an additional list of ncRNAs, only, actually is id ex/ "ID=FBtr0309810"
 	for i in gff_list: #this is just finding all the ncRNAS, a list of lists situation
 		if i[2] == 'ncRNA':
@@ -92,7 +91,6 @@ with open (mod_gff3, 'r') as f:
 			preidRNA = i[8].split(';')[0] #this is to pull out relevant info in last column
 			ncRNA.append(preidRNA)
 	#make an ncRNA_gff_dict so I can get relevant chromosome_arm, start, and stop info
-# def making_ncRNA_dictionary and simultaneously making fbgn_id_dictionary.
 	for r in ncRNA:
 		for i in gff_list:
 			data = i[8].split(';')[0] #honing in on relevant information
@@ -169,13 +167,13 @@ with open (mod_gff3, 'r') as f:
 # this is to remove ... actually... not sure... 
 # I think this is to find the coordinates for mel genes, which are in a set 
 #(so we don't find the coordinates twice for the same gene)		
-mel_gene_list = set()
+mel_gene_set = set() # initiates a set
 for k,v in fbgn_id_dict.iteritems():
 	for mg in v[0]:
-		mel_gene_list.add(mg)
+		mel_gene_set.add(mg)
 	for mg in v[1]:
-		mel_gene_list.add(mg)
-#print mel_gene_list
+		mel_gene_set.add(mg)
+#print mel_gene_set
 
 
 #putting the mel gene homologs? with their relevant coordinates in the appropriate species
@@ -192,7 +190,7 @@ with open(sys.argv[2], 'r') as orthos:
 			if sys.argv[3] in data[6]:
 				#just connect dmel gene with d(other) coordinates
 				#narrowing it down to mel genes that are upstream and downstream of the lncRNA
-				if data[0] in mel_gene_list:
+				if data[0] in mel_gene_set:
 					#info2 =pre_info2.split('=')[1]
 					coord = data[8].split ("..")
 					mapping[data[0]] = data[5], data[7], coord[0], coord[1]
