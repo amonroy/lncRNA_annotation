@@ -26,7 +26,7 @@ def ncRNA_list(list):
             ncRNA.append(preidRNA)
     return ncRNA
             
-            
+####This part is by far the most confusing! Go back through and comment it up            
 def ncRNA_gff_dict(rna_list, gff_list, window_length):
     """This function takes our two lists, ncRNA and gff_list and makes a great dictionary"""
     ncRNA_gff_dict = {}
