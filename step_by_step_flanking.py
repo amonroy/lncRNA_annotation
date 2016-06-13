@@ -1,8 +1,9 @@
 ## this is me going through and looking closely at 2_flanking_genes_ncRNA_2_v1.py
 
 import sys
-window_length = 4 #how many upstream genes and downstream genes
+window_length = 4 #assigns how many upstream genes and downstream genes are desired
 
+#this works
 def gff_list():
     """This function takes the modified gff3 file and creates a list"""
     mod_gff3 = sys.argv[1]
@@ -13,13 +14,13 @@ def gff_list():
         
         
         #gff_list ex/:
-	    #[['2L', 'FlyBase', 'gene', '7529', '9484', '.', '+', '.', 'ID=FBgn0031208;Name=CG11023;Ontology_term=SO:0000010,SO:0000087,GO:0016929,GO:0016926;Dbxref=FlyBase:FBan0011023,FlyBase_Annotation_IDs:CG11023,GB_protein:ACZ94128,GB_protein:AAO41164,GB:AI944728,GB:AJ564667,GB_protein:CAD92822,GB:BF495604,UniProt/TrEMBL:Q86BM6,INTERPRO:IPR003653,GB_protein:AGB92323,UniProt/TrEMBL:M9PAY1,OrthoDB7_Drosophila:EOG796K1P,OrthoDB7_Diptera:EOG7X1604,EntrezGene:33155,UniProt/TrEMBL:E1JHP8,UniProt/TrEMBL:Q6KEV3,OrthoDB7_Insecta:EOG7Q8QM7,OrthoDB7_Arthropoda:EOG7R5K68,OrthoDB7_Metazoa:EOG7D59MP,InterologFinder:33155,BIOGRID:59420,FlyAtlas:CG11023-RA,GenomeRNAi:33155;gbunit=AE014134;derived_computed_cyto=21A5-21A5'], 
-	    # ['2L', 'FlyBase', 'gene', '9839', '21376', '.', '-', '.', 'ID=FBgn0002121;Name=l(2)gl;fullname=lethal 
-
+	    #[['ID=FBtr0309810', 'ID=FBtr0347585', 'ID=FBtr0345732', 'ID=FBtr0345733', 'ID=FBtr0344052', 'ID=FBtr0344053', 'ID=FBtr0344032', 'ID=FBtr0336836', 'ID=FBtr0336837', 'ID=FBtr0336984', 'ID=FBtr0336985', 'ID=FBtr0336986', 'ID=FBtr0336987', 'ID=FBtr0336988', 'ID=FBtr0347594', 'ID=FBtr0347595']
+	  
+#this works  
 def ncRNA_list(list):
     """This function takes the gff_list and makes an ncRNA_list"""
     ncRNA = [] #initiates list
-    for i in gff_list:
+    for i in list:
         if i[2] == 'ncRNA':
             preidRNA = i[8].split(';')[0]
             #[ID=FBgn0031208];Name=CG11023;Ontology_term=SO:0000010,SO:0000087,GO:0016929,GO:0016926;Dbxref=FlyBase:FBan0011023,FlyBase_Annotation_IDs:CG11023,GB_protein:ACZ94128,GB_protein:AAO41164,GB:AI944728,GB:AJ564667,GB_protein:CAD92822,GB:BF495604,UniProt/TrEMBL:Q86BM6,INTERPRO:IPR003653,GB_protein:AGB92323,UniProt/TrEMBL:M9PAY1,OrthoDB7_Drosophila:EOG796K1P,OrthoDB7_Diptera:EOG7X1604,EntrezGene:33155,UniProt/TrEMBL:E1JHP8,UniProt/TrEMBL:Q6KEV3,OrthoDB7_Insecta:EOG7Q8QM7,OrthoDB7_Arthropoda:EOG7R5K68,OrthoDB7_Metazoa:EOG7D59MP,InterologFinder:33155,BIOGRID:59420,FlyAtlas:CG11023-RA,GenomeRNAi:33155;gbunit=AE014134;derived_computed_cyto=21A5-21A5'
@@ -27,13 +28,17 @@ def ncRNA_list(list):
     return ncRNA
             
 ####This part is by far the most confusing! Go back through and comment it up            
+#this works too! I am great at everything
 def ncRNA_gff_dict(rna_list, gff_list, window_length):
     """This function takes our two lists, ncRNA and gff_list and makes a great dictionary"""
     ncRNA_gff_dict = {}
+    fbgn_id_dict = {}
     for r in rna_list:
+        #print "This is r in rna_list", r
         for i in gff_list:
             data = i[8].split(';')[0]
             if data == r:
+                #print r, i #
                 post_data = data.split('=')[1] # ex/ FBgn0031208
                 ncRNA_gff_dict[post_data] = i[0], i[3], i[4]
                 #[['2L'], 'FlyBase', 'gene', ['7529'], ['9484'], '.', '+', '.', 'ID=FBgn0031208;Name=CG11023;...']
@@ -80,9 +85,16 @@ def ncRNA_gff_dict(rna_list, gff_list, window_length):
                 idRNA = r.split('=')[1]
                 #"front-back-gene-id-dict"
                 fbgn_id_dict[idRNA] = (up, down)
-        return fbgn_id_dict
-        return ncRNA_gff_dict
+    return fbgn_id_dict, ncRNA_gff_dict
+    #fbgn_id_dict
+    #{'FBtr0336987': (['FBgn0265149', 'FBgn0262252', 'FBgn0031235', 'FBgn0263465'], ['FBgn0022246', 'FBgn0031238', 'FBgn0031239', 'FBgn0265150']), 'FBtr0309810': (['FBgn0263584', 'FBgn0031209', 'FBgn0002121', 'FBgn0031208'], ['FBgn0051973', 'FBgn0267987', 'FBgn0266878', 'FBgn0266879']), 'FBtr0345733': (['FBgn0266879', 'FBgn0266878', 'FBgn0267987', 'FBgn0051973'], ['FBgn0067779', 'FBgn0266322', 'FBgn0031213', 'FBgn0031214']), 'FBtr0345732': (['FBgn0266878', 'FBgn0267987', 'FBgn0051973', 'FBgn0263584'], ['FBgn0266879', 'FBgn0067779', 'FBgn0266322', 'FBgn0031213']), 'FBtr0344053': (['FBgn0266322', 'FBgn0067779', 'FBgn0266879', 'FBgn0266878'], ['FBgn0031213', 'FBgn0031214', 'FBgn0002931', 'FBgn0031216']), 'FBtr0344052': (['FBgn0266322', 'FBgn0067779', 'FBgn0266879', 'FBgn0266878'], ['FBgn0031213', 'FBgn0031214', 'FBgn0002931', 'FBgn0031216']), 'FBtr0347585': (['FBgn0267987', 'FBgn0051973', 'FBgn0263584', 'FBgn0031209'], ['FBgn0266878', 'FBgn0266879', 'FBgn0067779', 'FBgn0266322']), 'FBtr0347595': (['FBgn0267996', 'FBgn0267995', 'FBgn0031245', 'FBgn0031244'], ['FBgn0025686', 'FBgn0031247', 'FBgn0017457']), 'FBtr0347594': (['FBgn0267995', 'FBgn0031245', 'FBgn0031244', 'FBgn0003444'], ['FBgn0267996', 'FBgn0025686', 'FBgn0031247', 'FBgn0017457']), 'FBtr0336988': (['FBgn0265150', 'FBgn0031239', 'FBgn0031238', 'FBgn0022246'], ['FBgn0031240', 'FBgn0086912', 'FBgn0086856', 'FBgn0086855']), 'FBtr0336984': (['FBgn0265151', 'FBgn0266557', 'FBgn0031233', 'FBgn0031232'], ['FBgn0265153', 'FBgn0265152', 'FBgn0263465', 'FBgn0031235']), 'FBtr0336985': (['FBgn0265153', 'FBgn0265151', 'FBgn0266557', 'FBgn0031233'], ['FBgn0265152', 'FBgn0263465', 'FBgn0031235', 'FBgn0262252']), 'FBtr0336986': (['FBgn0265152', 'FBgn0265153', 'FBgn0265151', 'FBgn0266557'], ['FBgn0263465', 'FBgn0031235', 'FBgn0262252', 'FBgn0265149']), 'FBtr0344032': (['FBgn0266304', 'FBgn0025683', 'FBgn0031220', 'FBgn0031219'], ['FBgn0001142', 'FBgn0265074', 'FBgn0265075', 'FBgn0051975']), 'FBtr0336836': (['FBgn0265074', 'FBgn0001142', 'FBgn0266304', 'FBgn0025683'], ['FBgn0265075', 'FBgn0051975', 'FBgn0051976', 'FBgn0051974']), 'FBtr0336837': (['FBgn0265075', 'FBgn0265074', 'FBgn0001142', 'FBgn0266304'], ['FBgn0051975', 'FBgn0051976', 'FBgn0051974', 'FBgn0031224'])}
+    #ncRNA_gff_dict
+    #{'FBtr0336987': ('2L', '248909', '249812'), 'FBtr0309810': ('2L', '21952', '24237'), 'FBtr0345733': ('2L', '66318', '66524'), 'FBtr0345732': ('2L', '65999', '66242'), 'FBtr0344053': ('2L', '71039', '73836'), 'FBtr0344052': ('2L', '71039', '73836'), 'FBtr0347585': ('2L', '54817', '55767'), 'FBtr0347595': ('2L', '286383', '288292'), 'FBtr0347594': ('2L', '283807', '284255'), 'FBtr0336988': ('2L', '262203', '263003'), 'FBtr0336984': ('2L', '219651', '220050'), 'FBtr0336985': ('2L', '223519', '224708'), 'FBtr0336986': ('2L', '228037', '228588'), 'FBtr0344032': ('2L', '122837', '124031'), 'FBtr0336836': ('2L', '135402', '136128'), 'FBtr0336837': ('2L', '136144', '136701')}
+
                                                           
-gff_list()
-ncRNA_list(gff_list)
-ncRNA_gff_dict(ncRNA, gff, window_length)
+gff_obj =gff_list()
+ncRNA_obj = ncRNA_list(gff_obj)
+#print ncRNA_obj
+fbgn_dict_obj, ncRNA_gff_dict_obj =ncRNA_gff_dict(ncRNA_obj, gff_obj, window_length)
+#print fbgn_dict_obj
+#print ncRNA_gff_dict_obj
