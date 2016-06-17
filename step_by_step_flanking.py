@@ -1,8 +1,10 @@
 ## this is me going through and looking closely at 2_flanking_genes_ncRNA_2_v1.py
 
 import sys
+import datetime
+today = datetime.date.today()
 window_length = 4 #assigns how many upstream genes and downstream genes are desired
-
+fly = sys.argv[3]
 #this works
 def gff_list():
     """This function takes the modified gff3 file and creates a list"""
@@ -146,6 +148,26 @@ def mel_rna_ortho(fbgn_id_dict, map):
     #'FBtr0309810': ([('FBgn0171619', 'scaffold_14', '27012', '28335'), ('FBgn0171620', 'scaffold_14', '19278', '25107'), ('FBgn0177629', 'scaffold_8', '1392069', '1396697')], [('FBgn0171618', 'scaffold_14', '31600', '58198')]), 
     #'FBtr0345733': ([('FBgn0171618', 'scaffold_14', '31600', '58198')], [('FBgn0171624', 'scaffold_14', '67886', '70036'), ('FBgn0171625', 'scaffold_14', '71736', '75558')]),
 
+def final_coord(ortho_dict, gff_dict):
+    """This function finds the end of the front gene ortholog and the front of the back gene ortholog, to give a dictionary with a putative start and putative stop"""
+    final_coord_dict = dict()
+    for key in ortho_dict.keys():
+        if key in gff_dict:
+            up, down = [], []
+            if len(ortho_dict[key][0]) != 0:
+                up.append(ortho_dict[key][0][0][1])
+                up.append(ortho_dict[key][0][0][3])
+            else:
+                print "skipped it all, no upstream!", orth_dict[key][0]
+            
+            if len(ortho_dict[key][1]) != 0:
+                down.append(ortho_dict[key][1][0][1])
+                down.append(ortho_dict[key][1][0][2])
+            else:
+                print "skipped it all, no downstream!", rna_ortho[key][1]
+            final_coord_dict[key] = (up, down)
+    return final_coord_dict     
+
 gff_obj =gff_list()
 ncRNA_obj = ncRNA_list(gff_obj)
 #print ncRNA_obj
@@ -159,4 +181,15 @@ ortho_map = ortho_mapping(mel_genes_obj)
 rna_ortho_dict = mel_rna_ortho(fbgn_dict_obj, ortho_map)
 print rna_ortho_dict
 #python lncRNA_annotation_doc/step_by_step_flanking.py out/1_prac_ncRNA_and_genes.txt 
-
+final_coord_obj = final_coord(rna_ortho_dict, ncRNA_gff_dict_obj)
+#print final_coord_obj
+#print type(final_coord_obj)
+write_out = open('2_%s_flanking_genes_%s_out.txt' %(fly,today),'w')
+for k,v in final_coord_obj.iteritems():
+    write_out.write("%s\t%s\t%s\t%s\t%s\n" %(k,v[0][0], v[0][1],v[1][0],v[1][1]))
+write_out.close()
+#ncRNA_gene_out = open('1_dmel_genes_ncRNA_%s_out.txt' %today, 'w')
+### the problem right now is how to let it be smart about which coordinates it uses
+### we only want the up and down coordinate if its on the same scaffold
+### so we want it to default to giving us the two closest ones, but then move along to
+### 
