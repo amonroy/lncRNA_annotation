@@ -5,6 +5,10 @@
 ## should I only let it input those 12?
 
 
+#also, probably a good idea to turn list of tuples into a list of list...
+
+# the parsed down gff only has genes and ncRNA.
+
 
 import sys
 import datetime
@@ -13,6 +17,10 @@ today = datetime.date.today()
 window_length = 4 #assigns how many upstream genes and downstream genes are desired
 
 fly_types_list = ['Dsim', 'Dsec', 'Dyak', 'Dere', 'Dana', 'Dpse', 'Dper', 'Dwil', 'Dmoj', 'Dvir', 'Dgri']
+#what fly?
+# ok or sorry that does not exist
+#try again
+# how to get it to quit?
 
 #I think I should change this to be interactive
 fly = sys.argv[3]
@@ -206,6 +214,10 @@ def final_coord(ortho_dict, gff_dict):
             
             #final_coord_dict[key] = (up, down)
     #return final_coord_dict     
+###PSEUDO CODE:::
+
+
+
 
 gff_obj =gff_list()
 #print gff_obj
