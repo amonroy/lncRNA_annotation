@@ -7,15 +7,14 @@
 # to run this code in Desktop/Projects/lncRNA directory on my laptop
 #python lncRNA_annotation_doc/step_by_step_flanking.py out/1_prac_ncRNA_and_genes.txt flybase/gene_orthologs_fb_2016_03.tsv Dsec
 
-
 #also, probably a good idea to turn list of tuples into a list of list...
 
 # the parsed down gff only has genes and ncRNA.
 
-
 import sys
 import datetime
 import itertools
+import os
 today = datetime.date.today()
 window_length = 4 #assigns how many upstream genes and downstream genes are desired
 
@@ -39,7 +38,6 @@ def gff_list():
     #['2L', 'FlyBase', 'gene', '7529', '9484', '.', '+', '.', 'ID=FBgn0031208;Name=CG11023;Ontology_term=SO:0000010,SO:0000087,GO:0016929,GO:0016926;Dbxref=FlyBase:FBan0011023,FlyBase_Annotation_IDs:CG11023,GB_protein:ACZ94128,GB_protein:AAO41164,GB:AI944728,GB:AJ564667,GB_protein:CAD92822,GB:BF495604,UniProt/TrEMBL:Q86BM6,INTERPRO:IPR003653,GB_protein:AGB92323,UniProt/TrEMBL:M9PAY1,OrthoDB7_Drosophila:EOG796K1P,OrthoDB7_Diptera:EOG7X1604,EntrezGene:33155,UniProt/TrEMBL:E1JHP8,UniProt/TrEMBL:Q6KEV3,OrthoDB7_Insecta:EOG7Q8QM7,OrthoDB7_Arthropoda:EOG7R5K68,OrthoDB7_Metazoa:EOG7D59MP,InterologFinder:33155,BIOGRID:59420,FlyAtlas:CG11023-RA,GenomeRNAi:33155;gbunit=AE014134;derived_computed_cyto=21A5-21A5'], ['2L', 'FlyBase', 'gene', '9839', '21376', '.', '-', '.', 'ID=FBgn0002121;Name=l(2)gl;fullname=lethal (2) giant larvae;Alias=Lgl,lgl,lethal giant larvae,lethal giant larve,lethal giant larva,lethal(2)giant larvae,Complementation group 2.1,Lethal Giant Larvae,dlgl,p127l(2)gl,LGL,l(2) giant larva,CG2671,L(2)GL,p127,l(2)giant larvae,D-LGL,l(2),gl,l[[2]]gl,l-gl,lethal-giant-larvae,Lethal giant larvae,Lethal (2) giant larvae,L(2)gl,Lethal (2) giant larva,Lethal-giant-larvae,MENE (2L)-B,lethal(2) giant larvae,p127[l(2)gl],lethal(2)-giant larvae,lethal-2-giant larvae,l(2) giant larvae,lethal- giant-larvae,Lethal(2)giant larvae,Lethal-2-giant larvae;Ontology_term=SO:0000010,SO:0000087,GO:0005578,GO:0005886,GO:0007269,GO:0016082,GO:0008021,GO:0008283,GO:0016334,GO:0016336,GO:0016333,GO:0016335,GO:0016327,GO:0005829,GO:0045175,GO:0016332,GO:0045184,GO:0007399,GO:0005938,GO:0005737,GO:0007179,GO:0045197,GO:0045196,GO:0002009,GO:0005918,GO:0008105,GO:0045167,GO:0008104,GO:0045746,GO:0007423,GO:0008285,GO:0001738,GO:0016323,GO:0007391,GO:0005856,GO:0030154,GO:0042127,GO:0005614,GO:0045159,GO:0035072,GO:0007559,GO:0045200,GO:0008360,GO:0019991,GO:0007406,GO:0051726,GO:0051668,GO:0007314,GO:0016325,GO:0030036,GO:0030863,GO:0035070,GO:0055059,GO:0035212,GO:0035293,GO:0090163,GO:0048730,GO:0000132,GO:0098725,GO:0060429,GO:0007293,GO:0045176,GO:0072697,GO:0000149,SO:0000548,GO:0005920,GO:0017022,GO:0004860,GO:0006469;Dbxref=FlyBase:FBan0002671,FlyBase_Annotation_IDs:CG2671,INTERPRO:IPR015943,GB_protein:AAN10503,GB_protein:AAG22256,GB_protein:AAN10502,GB_protein:AAN10501,GB_protein:AAF51570,GB_protein:AAG22255,INTERPRO:IPR017986,GB:AA246243,GB:AW942062,GB:AY051654,GB_protein:AAK93078,GB:BH809482,GB:CZ471313,GB:CZ482024,GB:CZ484691,GB:M17022,GB_protein:AAA28671,GB_protein:AAA28672,GB:X05426,GB_protein:CAA29007,UniProt/Swiss-Prot:P08111,INTERPRO:IPR000664,INTERPRO:IPR001680,INTERPRO:IPR013577,GB_protein:AGB92324,UniProt/TrEMBL:M9NCX1,UniProt/TrEMBL:M9PBJ2,OrthoDB7_Drosophila:EOG7CW2GT,OrthoDB7_Diptera:EOG7DRVK2,GB_protein:AFH03479,GB_protein:AFH03478,GB_protein:AFH03481,GB_protein:AFH03480,EntrezGene:33156,INTERPRO:IPR013905,BDGP_clone:PC00404,OrthoDB7_Insecta:EOG7SRGKH,OrthoDB7_Arthropoda:EOG7ZDD82,OrthoDB7_Metazoa:EOG79W94C,InterologFinder:33156,FlyAtlas:CG2671-RB,BIOGRID:59421,Fly-FISH:CG2671,GenomeRNAi:33156,INTERACTIVEFLY:/cytoskel/lethl2g1.htm;gbunit=AE014134;derived_computed_cyto=21A5-21A5'],
     # ['2L', 'FlyBase', 'ncRNA', '286383', '288292', '.', '+', '.', 'ID=FBtr0347595;Name=CR46263-RA;Parent=FBgn0267996;Dbxref=FlyBase_Annotation_IDs:CR46263-RA;score_text=Weakly Supported;score=0'], ['2L', 'FlyBase', 'gene', '287252', '289144', '.', '-', '.', 'ID=FBgn0025686;Name=Amnionless;fullname=Amnionless ortholog;Alias=FBgn0031246,CG11592,CK02467,BEST:CK02467,dAMN,Amnionless;Ontology_term=SO:0000010,SO:0000087,GO:0046331,GO:0097206,GO:0016021,GO:0097017;Dbxref=FlyBase:FBan0011592,FlyBase_Annotation_IDs:CG11592,GB_protein:AAF51514,GB:AA141784,GB:CZ468687,UniProt/TrEMBL:Q9VPN2,GB_protein:AGB92350,OrthoDB7_Drosophila:EOG7CGKJK,EntrezGene:33199,BDGP_clone:IP03221,OrthoDB7_Diptera:EOG774804,INTERPRO:IPR026112,OrthoDB7_Insecta:EOG7G266G,OrthoDB7_Arthropoda:EOG7P65FW,OrthoDB7_Metazoa:EOG7ZGX2W,InterologFinder:33199,FlyAtlas:CG11592-RA,GenomeRNAi:33199;gbunit=AE014134;derived_computed_cyto=21B7-21B7'], ['2L', 'FlyBase', 'gene', '292419', '293222', '.', '+', '.', 'ID=FBgn0031247;Name=CG11562;Alias=FBgn0063011,BcDNA:RE44650;Ontology_term=SO:0000010,SO:0000087,GO:0005739,GO:0003674,GO:0008150;Dbxref=FlyBase:FBan0011562,FlyBase_Annotation_IDs:CG11562,GB_protein:AAF51513,GB:AI520524,GB:AI945841,GB:AY119645,GB_protein:AAM50299,GB:BE662187,GB:BI358003,UniProt/TrEMBL:Q9VPN3,OrthoDB7_Drosophila:EOG7HTW3H,OrthoDB7_Diptera:EOG7200K9,EntrezGene:33200,BDGP_clone:RE44650,OrthoDB7_Insecta:EOG7B9454,OrthoDB7_Arthropoda:EOG7RK278,OrthoDB7_Metazoa:EOG78H3X3,FlyAtlas:CG11562-RA,INTERPRO:IPR031568,Fly-FISH:CG11562,GenomeRNAi:33200;gbunit=AE014134;derived_computed_cyto=21B7-21B7'], ['2L', 'FlyBase', 'gene', '292959', '294681', '.', '-', '.', 'ID=FBgn0017457;Name=U2af38;fullname=U2 small nuclear riboprotein auxiliary factor 38;Alias=FBgn0010626,U2AF38,U2AF,dU2AF38,DU2AF38,CG3582,dU2AF[38],l(2)06751,u2af38,U2AF 38;Ontology_term=GO:0089701,SO:0000010,SO:0000087,GO:0000398,GO:0008187,GO:0005681,GO:0005686,GO:0000381,GO:0005634,GO:0003729,GO:0007052,GO:0071011,GO:0008380,GO:0000166,GO:0046872;Dbxref=FlyBase:FBan0003582,FlyBase_Annotation_IDs:CG3582,GB_protein:AAF51512,GB:AA264081,GB:AA820431,GB:AC004115,GB:AC008371,GB:AI061776,GB:AI455418,GB:AI944553,GB:AQ026079,GB:AY058537,GB_protein:AAL13766,GB:U67066,GB_protein:AAB17271,UniProt/Swiss-Prot:Q94535,INTERPRO:IPR000504,INTERPRO:IPR000571,INTERPRO:IPR009145,INTERPRO:IPR012677,GB_protein:AGB92351,UniProt/TrEMBL:M9PBM1,OrthoDB7_Drosophila:EOG7FRM2M,OrthoDB7_Diptera:EOG700KS6,EntrezGene:33201,BDGP_clone:LD24048,OrthoDB7_Insecta:EOG76QSHP,OrthoDB7_Arthropoda:EOG7KMJ7T,OrthoDB7_Metazoa:EOG70089G,apodroso:10448-U2af38[k14504],InterologFinder:33201,FlyAtlas:CG3582-RA,BIOGRID:59457,Fly-FISH:CG3582,GenomeRNAi:33201;gbunit=AE014134;derived_computed_cyto=21B7-21B8']]
 
-        
 #this works  
 def ncRNA_list(list):
     """This function takes the gff_list and makes an ncRNA_list"""
@@ -210,8 +208,14 @@ def final_coord(ortho_dict):#rna_ortho_dict,
                     dpos.append(gene[3])
         #print "This is upos", upos
         #print "This is dpos", dpos
-        print k, x, max(upos), min(dpos)
-    quit()
+        final_coord_dict[k] = [x, max(upos), min(dpos)]
+    return final_coord_dict
+        #print k, x, max(upos), min(dpos)
+        #FBtr0344032 Scf_2L 114960 117805
+        #FBtr0309810 Scf_2L 4304 17164
+        #FBtr0345733 Scf_2L 47089 52876
+
+    #quit()
         
         #v[0], v[1] are lists of tuples
         #FBtr0344032 ([('FBgn0171613', 'scaffold_14', '122003', '129535'), ('FBgn0171614', 'scaffold_14', '115786', '118485')], [('FBgn0171629', 'scaffold_14', '131505', '132704'), ('FBgn0171610', 'scaffold_14', '138261', '139727')])
@@ -219,7 +223,114 @@ def final_coord(ortho_dict):#rna_ortho_dict,
         #quit()
 ###PSEUDO CODE:::
 
+def get_all_u_scaffs(coord_dict):
+    all_unique_scaffs= set()
+    for k,v in coord_dict.iteritems():
+        #print "This is v, and v[0]", v, v[0]
+        all_unique_scaffs.add(v[0])
+    return all_unique_scaffs
 
+#figure out how to only read in the file once, then go through the scaffolds
+def read_in_file_from_user():
+    user_input = raw_input("Enter the path of the scaffold file: ")
+    ###would be good if I added a part here that you can only work on the species that you found orthos for
+    assert os.path.exists(user_input), "I did not find the file at, "+str(user_input)
+    print ("Hooray we found your file!")
+    
+    return user_input
+    
+def karl_read_scaffolds(filepath):
+    """Need to check this works"""
+    #print "I am in karl_read"
+    with open(filepath, 'r+') as species:
+        #print "I got past the 'with'"
+        key = ''
+        fly = dict()
+        count = 0
+        for line in species:
+            if line.startswith('>') and count < 5:
+                print line
+                key = line.split(' ')[0][1:]
+                print key
+                fly[key]= ''
+               # print fly[key]
+                #print type(fly[key])
+                count += 1
+            elif line.startswith('>') == False:
+                fly[key]+=line.strip()
+            	continue
+            else:
+                print "Uknown scenario:", line
+                quit()
+    #print "This is fly:", fly
+    return fly
+    
+def anais_read_scaffolds(filepath, set):
+    """Trying to see if this one works better"""
+    sequence =''
+    key =''
+    scaffold = dict()
+    carrot = False
+    with open(filepath, 'r+') as species:
+        for line in species:
+            if carrot:
+                if line.startswith('>'):
+                    carrot = False
+                    scaffold[key]= sequence
+                    key = line.split(' ')[0][1:]
+                    if key in set:
+                        carrot = True
+                    else:
+                        carrot = False
+                    #print "key %s in the 'carrot'" %key
+                    pass
+                sequence += line.strip()
+            else:
+                if line.startswith('>'):
+                    key = line.split(' ')[0][1:]
+                    if key in set:
+                    #print "Key %s in the 'else'" %key
+                        carrot = True
+    return scaffold
+                    
+###this needs to be looked at again, haven't quite figured this out
+#def read_scaff_from_file(input):
+#    f = open(input, 'r+')
+#    sequence = ""
+#    found = False
+#    for line in f:
+#        if found:
+#            if line.startswith('>'):
+#                break
+#            sequence += line.strip()
+#            
+#        else:
+#            if line.strip().startswith('>'+scaffold):
+#                found = True
+#                header = line
+#    return sequence
+#    f.close()
+
+###some other def --- needs to be super worked on
+#def some_other(sequence)
+#in_file = sys.argv[1]
+
+#end_start = 1
+#end_stop = 50
+#start = end_start-1
+#stop = end_stop+1
+
+#with open (in_file, 'r') as i: #open ('3R_fafrag_prac.fa', 'w') as out:
+#    header = i.readline().rstrip()
+#    print header
+#    for line in i:
+#        #header = line
+        #print header
+#        sequence = line.strip('\n')
+        #print sequence
+#        print sequence[end_start:end_stop]
+            
+        #print sequence[start:stop]
 
 
 gff_obj =gff_list()
@@ -234,7 +345,6 @@ fbgn_dict_obj, ncRNA_gff_dict_obj =ncRNA_gff_dict(ncRNA_obj, gff_obj, window_len
 #print ncRNA_gff_dict_obj
 mel_genes_obj = mel_gene_set(fbgn_dict_obj)
 #print mel_genes_obj
-
 ortho_map = ortho_mapping(mel_genes_obj)
 #print ortho_map
 rna_ortho_dict = mel_rna_ortho(fbgn_dict_obj, ortho_map)
@@ -243,15 +353,30 @@ rna_ortho_dict = mel_rna_ortho(fbgn_dict_obj, ortho_map)
 #python lncRNA_annotation_doc/step_by_step_flanking.py out/1_prac_ncRNA_and_genes.txt 
 final_coord_obj = final_coord(rna_ortho_dict)
 #print final_coord_obj
-#print type(final_coord_obj)
-#write_out = open('2_%s_flanking_genes_%s_out.txt' %(fly,today),'w')
-#for k,v in final_coord_obj.iteritems():
-#    write_out.write("%s\t%s\t%s\t%s\t%s\n" %(k,v[0][0], v[0][1],v[1][0],v[1][1]))
-#write_out.close()
-#ncRNA_gene_out = open('1_dmel_genes_ncRNA_%s_out.txt' %today, 'w')
-### the problem right now is how to let it be smart about which coordinates it uses
-### we only want the up and down coordinate if its on the same scaffold
-### so we want it to default to giving us the two closest ones, but then move along to
-### i think in order to ensure the order of the upstream and downstream lists, need to make the values of the appropriate dictionary a tuple?
+scaffs_set = get_all_u_scaffs(final_coord_obj)
+print "This is scaffs_set", scaffs_set
+input = read_in_file_from_user()
+#fly_dict = karl_read_scaffolds(input)
+scaff_dict = anais_read_scaffolds(input, scaffs_set)
+for k,v in scaff_dict.iteritems():
+    print k
+print scaff_dict[scaffold_109]
 
-### 
+
+#flybase/dsec-all-chromosome-r1.3.fasta
+#what all-chromosome file for flies (under fasta sequence)
+#
+#print scaffs_set
+
+##DGRP? initial pass to compare against mel.
+    ## how well do you do?
+    ## might not be any variation, but intersting if it is
+    ## each individual raleigh line is its own species
+    
+##classify by structure
+#PCA multidimensional scaling? what can the computer use to handle it?
+#naively look for structure against all 10 species
+
+
+#scaffold_1 type=golden_path_region; loc=scaffold_1:1..14215200; ID=scaffold_1; dbxref=GB:CH480816,REFSEQ:NW_001999690; MD5=390802af22260f1bc1b969b928cafa29; length=14215200; release=r1.3; species=Dsec;
+#>scaffold_0 type=golden_path_region; loc=scaffold_0:1..21120651; ID=scaffold_0; dbxref=GB:CH480815,REFSEQ:NW_001999689; MD5=6d2fa4d8ab670b07e9100cce3fdb1c22; length=21120651; release=r1.3; species=Dsec;
