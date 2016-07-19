@@ -172,9 +172,9 @@ def ortho_final_coord(ortho_dict):#rna_ortho_dict,
 		upos_num = [int(n) for n in upos]
 		dpos_num = [int(n) for n in dpos]
 		merged_pos = upos_num + dpos_num
-		print min(merged_pos)
+		#print min(merged_pos)
 		final_coord_dict[k] = [x, min(merged_pos), max(merged_pos)]
-		print k, final_coord_dict[k]
+		#print k, final_coord_dict[k]
 		
 	return final_coord_dict
 		#'FBtr0342867': ['scaffold_0', '3442611', '3447776'], 'FBtr0342862': ['scaffold_0', '3442611', '3447776']
@@ -219,6 +219,8 @@ def mel_ncrna_seq_dict():
 	
 def mel_ortho_output_sequence(scaf_dict, coord_dict, mel_seqs):
 	"""This print the sequence of putative lncRNA in non-mel species, using start and stop and scaffold"""
+	#make out file to be written to
+	out_file = open('out_flybase_%s_ncRNA_mel_and_ortho_seq_%s.txt' %(fly, today), 'w')
 	for k, v in coord_dict.iteritems():
 		#print "This is k", k
 		#print "This is v", v
@@ -230,8 +232,13 @@ def mel_ortho_output_sequence(scaf_dict, coord_dict, mel_seqs):
 		if v[2] < v[1]:
 			start = int(v[2])+1
 			end = int(v[1])+1
-		print '>'+k+';'+'dmel'+'\n',mel_seqs[k] 
-		print '>'+k+';'+fly+'\n',scaf_dict[v[0]][start:end]	
+		#print '>'+k+';'+'dmel'+'\n',mel_seqs[k] 
+		#print '>'+k+';'+fly+'\n',scaf_dict[v[0]][start:end]
+		out_file.write(">%s;dmel\n%s\n" %(k, mel_seqs[k]))
+		out_file.write(">%s;%s\n%s\n" %(k, fly, scaf_dict[v[0]][start:end]))
+		#out_file.write('>'+k+';'+'dmel'+'\n',mel_seqs[k])
+		#out_file.write('>'+k+';'+fly+'\n',scaf_dict[v[0]][start:end])
+	out_file.close()
 
 ### making sure the functions are executed in the right order
 mel_gff_obj = mel_gff_list()
@@ -254,3 +261,7 @@ ortho_scaff_dict = ortho_read_scaffolds()
 mel_rna_seqs_obj = mel_ncrna_seq_dict()
 
 mel_ortho_output_sequence(ortho_scaff_dict, ortho_final_coord_obj, mel_rna_seqs_obj)
+
+#flybase/dsec-all-chromosome-r1.3.fasta
+#ncRNA_flank = open ('2_out_%s_flanking_genes_ncRNA_%s.txt' %(flyname, today), 'w')
+#ncRNA_flank.write("%s\t%s\t%s\t%s\n" %(k, v[0][0], v[0][1], v[1][1]))
