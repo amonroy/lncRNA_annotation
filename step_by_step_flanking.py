@@ -59,7 +59,7 @@ def ncRNA_list(list):
 #this works too! I am great at everything
 def ncRNA_gff_dict(rna_list, gff_list, window_length):
 	"""This function takes our two lists, ncRNA and gff_list and makes two great dictionaries. fbgn_id_dict where the key is ncRNA and the values are upstream genes and downstream genes. ncRNA_gff_dict where the key is ncRNA gene and the values are chromosome, start, stop, for dmel"""
-	ncRNA_gff_dict = {}
+	#ncRNA_gff_dict = {}
 	fbgn_id_dict = {}
 	for r in rna_list:
 		#print "This is r in rna_list", r
@@ -67,8 +67,8 @@ def ncRNA_gff_dict(rna_list, gff_list, window_length):
 			data = i[8].split(';')[0]
 			if data == r:
 				#print r, i #
-				post_data = data.split('=')[1] # ex/ FBgn0031208
-				ncRNA_gff_dict[post_data] = i[0], i[3], i[4]
+				#post_data = data.split('=')[1] # ex/ FBgn0031208
+				#ncRNA_gff_dict[post_data] = i[0], i[3], i[4]
 				#[['2L'], 'FlyBase', 'gene', ['7529'], ['9484'], '.', '+', '.', 'ID=FBgn0031208;Name=CG11023;...']
 				index = gff_list.index(i)# indexing so more efficient to move backward
 				upstream = 0
@@ -113,12 +113,10 @@ def ncRNA_gff_dict(rna_list, gff_list, window_length):
 				idRNA = r.split('=')[1]
 				#"front-back-gene-id-dict"
 				fbgn_id_dict[idRNA] = (up, down)
-	return fbgn_id_dict, ncRNA_gff_dict
+	return fbgn_id_dict
 	#fbgn_id_dict
 	#{'FBtr0336987': (['FBgn0265149', 'FBgn0262252', 'FBgn0031235', 'FBgn0263465'], ['FBgn0022246', 'FBgn0031238', 'FBgn0031239', 'FBgn0265150']), 'FBtr0309810': (['FBgn0263584', 'FBgn0031209', 'FBgn0002121', 'FBgn0031208'], ['FBgn0051973', 'FBgn0267987', 'FBgn0266878', 'FBgn0266879']), 'FBtr0345733': (['FBgn0266879', 'FBgn0266878', 'FBgn0267987', 'FBgn0051973'], ['FBgn0067779', 'FBgn0266322', 'FBgn0031213', 'FBgn0031214']), 'FBtr0345732': (['FBgn0266878', 'FBgn0267987', 'FBgn0051973', 'FBgn0263584'], ['FBgn0266879', 'FBgn0067779', 'FBgn0266322', 'FBgn0031213']), 'FBtr0344053': (['FBgn0266322', 'FBgn0067779', 'FBgn0266879', 'FBgn0266878'], ['FBgn0031213', 'FBgn0031214', 'FBgn0002931', 'FBgn0031216']), 'FBtr0344052': (['FBgn0266322', 'FBgn0067779', 'FBgn0266879', 'FBgn0266878'], ['FBgn0031213', 'FBgn0031214', 'FBgn0002931', 'FBgn0031216']), 'FBtr0347585': (['FBgn0267987', 'FBgn0051973', 'FBgn0263584', 'FBgn0031209'], ['FBgn0266878', 'FBgn0266879', 'FBgn0067779', 'FBgn0266322']), 'FBtr0347595': (['FBgn0267996', 'FBgn0267995', 'FBgn0031245', 'FBgn0031244'], ['FBgn0025686', 'FBgn0031247', 'FBgn0017457']), 'FBtr0347594': (['FBgn0267995', 'FBgn0031245', 'FBgn0031244', 'FBgn0003444'], ['FBgn0267996', 'FBgn0025686', 'FBgn0031247', 'FBgn0017457']), 'FBtr0336988': (['FBgn0265150', 'FBgn0031239', 'FBgn0031238', 'FBgn0022246'], ['FBgn0031240', 'FBgn0086912', 'FBgn0086856', 'FBgn0086855']), 'FBtr0336984': (['FBgn0265151', 'FBgn0266557', 'FBgn0031233', 'FBgn0031232'], ['FBgn0265153', 'FBgn0265152', 'FBgn0263465', 'FBgn0031235']), 'FBtr0336985': (['FBgn0265153', 'FBgn0265151', 'FBgn0266557', 'FBgn0031233'], ['FBgn0265152', 'FBgn0263465', 'FBgn0031235', 'FBgn0262252']), 'FBtr0336986': (['FBgn0265152', 'FBgn0265153', 'FBgn0265151', 'FBgn0266557'], ['FBgn0263465', 'FBgn0031235', 'FBgn0262252', 'FBgn0265149']), 'FBtr0344032': (['FBgn0266304', 'FBgn0025683', 'FBgn0031220', 'FBgn0031219'], ['FBgn0001142', 'FBgn0265074', 'FBgn0265075', 'FBgn0051975']), 'FBtr0336836': (['FBgn0265074', 'FBgn0001142', 'FBgn0266304', 'FBgn0025683'], ['FBgn0265075', 'FBgn0051975', 'FBgn0051976', 'FBgn0051974']), 'FBtr0336837': (['FBgn0265075', 'FBgn0265074', 'FBgn0001142', 'FBgn0266304'], ['FBgn0051975', 'FBgn0051976', 'FBgn0051974', 'FBgn0031224'])}
-	#ncRNA_gff_dict
-	#{'FBtr0336987': ('2L', '248909', '249812'), 'FBtr0309810': ('2L', '21952', '24237'), 'FBtr0345733': ('2L', '66318', '66524'), 'FBtr0345732': ('2L', '65999', '66242'), 'FBtr0344053': ('2L', '71039', '73836'), 'FBtr0344052': ('2L', '71039', '73836'), 'FBtr0347585': ('2L', '54817', '55767'), 'FBtr0347595': ('2L', '286383', '288292'), 'FBtr0347594': ('2L', '283807', '284255'), 'FBtr0336988': ('2L', '262203', '263003'), 'FBtr0336984': ('2L', '219651', '220050'), 'FBtr0336985': ('2L', '223519', '224708'), 'FBtr0336986': ('2L', '228037', '228588'), 'FBtr0344032': ('2L', '122837', '124031'), 'FBtr0336836': ('2L', '135402', '136128'), 'FBtr0336837': ('2L', '136144', '136701')}
-#this works!
+
 def mel_gene_set(dict): # this uses the flanking genes, specifically
 	"""This function finds unique mel genes, and puts them in a set (what is returned), so we don't get the same coords twice. It takes fbgn_id_dict. This is so we have the mel genes that we need coordinates for in the non-mel species', ie we're using this to find the orthologs that we care about"""
 	mel_gene_set = set()
@@ -265,19 +263,13 @@ def get_all_u_scaffs(coord_dict):
 		all_unique_scaffs.add(v[0])
 	return all_unique_scaffs
 
-#figure out how to only read in the file once, then go through the scaffolds
-def read_in_file_from_user():
-	user_input = raw_input("Enter the path of the scaffold file: ")
-	###would be good if I added a part here that you can only work on the species that you found orthos for
-	assert os.path.exists(user_input), "I did not find the file at, "+str(user_input)
-	print ("Hooray we found your file!")
-	
-	return user_input
-	
 def karl_read_scaffolds(filepath):
 	"""Need to check this works"""
+	user_input = raw_input("Enter the path of the scaffold file: ")
+	assert os.path.exists(user_input), "I did not find the file at, "+str(user_input)
+	print ("Hooray we found your file!")
 	#print "I am in karl_read"
-	with open(filepath, 'r+') as species:
+	with open(user_input, 'r+') as species:
 		key = ''
 		sequence = []
 		fly = dict()
@@ -416,10 +408,10 @@ rna_seqs_obj = ncrna_seq_dict()
 #flybase/dsec-all-chromosome-r1.3.fasta
 
 #This is just to quickly compare the output from the lncRNA keys created from the ncRNA file, versus the ncRNA found in the GFF3 file
-
-print len(ncRNA_gff_dict_obj)
-print len(rna_seqs_obj)
-print len(ncRNA_obj)
+#They are all the same length == 2914
+#print len(ncRNA_gff_dict_obj)
+#print len(rna_seqs_obj)
+#print len(ncRNA_obj)
 
 
 #print len(set(scaff_dict.values()))
