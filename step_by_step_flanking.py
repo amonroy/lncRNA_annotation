@@ -58,8 +58,7 @@ def ncRNA_list(list):
 ####This part is by far the most confusing! Go back through and comment it up			
 #this works too! I am great at everything
 def ncRNA_gff_dict(rna_list, gff_list, window_length):
-	"""This function takes our two lists, ncRNA and gff_list and makes two great dictionaries. fbgn_id_dict where the key is ncRNA and the values are upstream genes and downstream genes. ncRNA_gff_dict where the key is ncRNA gene and the values are chromosome, start, stop, for dmel"""
-	#ncRNA_gff_dict = {}
+	"""This function takes our two lists, ncRNA and gff_list and makes a dictionary. fbgn_id_dict where the key is ncRNA and the values are upstream genes and downstream genes. """
 	fbgn_id_dict = {}
 	for r in rna_list:
 		#print "This is r in rna_list", r
@@ -175,7 +174,7 @@ def mel_rna_ortho(fbgn_id_dict, map):
 	#'FBtr0309810': ([('FBgn0171619', 'scaffold_14', '27012', '28335'), ('FBgn0171620', 'scaffold_14', '19278', '25107'), ('FBgn0177629', 'scaffold_8', '1392069', '1396697')], [('FBgn0171618', 'scaffold_14', '31600', '58198')]), 
 	#'FBtr0345733': ([('FBgn0171618', 'scaffold_14', '31600', '58198')], [('FBgn0171624', 'scaffold_14', '67886', '70036'), ('FBgn0171625', 'scaffold_14', '71736', '75558')]),
 
-def final_coord(ortho_dict):#rna_ortho_dict,
+def ortho_final_coord(ortho_dict):#rna_ortho_dict,
 	"""This function finds the end of the front gene ortholog and the front of the back gene ortholog, to give a dictionary with a putative start and putative stop"""
 	final_coord_dict = dict()
 	for k, v in ortho_dict.iteritems():
@@ -252,17 +251,6 @@ def final_coord(ortho_dict):#rna_ortho_dict,
 		#FBtr0344032 ([('FBgn0171613', 'scaffold_14', '122003', '129535'), ('FBgn0171614', 'scaffold_14', '115786', '118485')], [('FBgn0171629', 'scaffold_14', '131505', '132704'), ('FBgn0171610', 'scaffold_14', '138261', '139727')])
 
 		#quit()
-###PSEUDO CODE:::
-
-
-### this is potentially not necessary
-def get_all_u_scaffs(coord_dict):
-	all_unique_scaffs= set()
-	for k,v in coord_dict.iteritems():
-		#print "This is v, and v[0]", v, v[0]
-		all_unique_scaffs.add(v[0])
-	return all_unique_scaffs
-
 def karl_read_scaffolds(filepath):
 	"""Need to check this works"""
 	user_input = raw_input("Enter the path of the scaffold file: ")
@@ -372,9 +360,9 @@ ncRNA_obj = ncRNA_list(gff_obj)
 #print ncRNA_obj
 #quit()
 #print ncRNA_obj
-fbgn_dict_obj, ncRNA_gff_dict_obj =ncRNA_gff_dict(ncRNA_obj, gff_obj, window_length)
+fbgn_dict_obj =ncRNA_gff_dict(ncRNA_obj, gff_obj, window_length)
 #print fbgn_dict_obj
-#print ncRNA_gff_dict_obj
+
 mel_genes_obj = mel_gene_set(fbgn_dict_obj)
 #print mel_genes_obj
 ortho_map = ortho_mapping(mel_genes_obj)
@@ -389,7 +377,7 @@ rna_seqs_obj = ncrna_seq_dict()
 #print rna_seqs_obj
 #quit()
 
-#scaffs_set = get_all_u_scaffs(final_coord_obj)
+
 #print "This is scaffs_set", scaffs_set
 #input = read_in_file_from_user()
 #fly_dict = karl_read_scaffolds(input)
@@ -420,7 +408,7 @@ rna_seqs_obj = ncrna_seq_dict()
 #cd 
 #what all-chromosome file for flies (under fasta sequence)
 #
-#print scaffs_set
+
 
 ##DGRP? initial pass to compare against mel.
 	## how well do you do?

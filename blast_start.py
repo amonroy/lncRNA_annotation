@@ -1,16 +1,67 @@
+# this code is a simple function to read in blast results (in format 6) and then sort them
+#
+
+
+
 import sys
-import datetime
-import itertools
-import os
 
-today = datetime.date.today()
-window_length = 4
-fly = sys.argv[3]
 
+#this works so far
+def find_best_hit():
+	"""This reads in your blast output (in format 6) and gives you the data for the best hit per protein. Makes a dictionary."""
+	blast_file = sys.argv[1]
+
+	#initiate dictionary
+	protein_dict = {}
+
+
+	with open(blast_file, 'rU') as f:
+		for line in f:
+			#print line
+			data = line.strip().split('\t')
+			#print data
+			key = data[0]
+			#print key
+			if key in protein_dict:
+				#print protein_dict[key][9]
+				if float(protein_dict[key][9]) < float(data[10]):
+					continue
+				if float(protein_dict[key][9])> float(data[10]):
+					protein_dict[key] = data[1:]
+			else:
+				protein_dict[key]= data[1:]
+		return protein_dict
+
+def match_pp_to_gn():
+	"""This has to read in the stupid protein files, and find the gn name associated with the protein"""
+	gn_to_pp_dict = {}
+	protein = sys.argv[2]
+	with open(protein, 'r') as p:
+		for line in p:
+			if line.startswith('>'):
+				data = line.strip().split(';')
+				#print data
+				pp = data[2].split('=')[1]
+				gn = data[4].split(',')[0].split('=')[1]
+				#parent=FBgn0031081,FBtr0070000
+				#print pp
+				#print gn
+				gn_to_pp_dict[gn]=pp
+				#ID=FBpp0070000
+				#  [0]                                 [1]                                                                                                                                                                 [2]*                    [3]              [4]*
+				#['>FBpp0070000 type=protein', ' loc=X:join(19963955..19964071,19964782..19964944,19965006..19965126,19965197..19965511,19965577..19966071,19966183..19967012,19967081..19967223,19967284..19967460)', ' ID=FBpp0070000', ' name=Nep3-PA', ' parent=FBgn0031081,FBtr0070000', ' dbxref=FlyBase:FBpp0070000,FlyBase_Annotation_IDs:CG9565-PA,GB_protein:AAF45370.2,REFSEQ:NP_523417,GB_protein:AAF45370,UniProt/TrEMBL:Q9W5Y0,FlyMine:FBpp0070000,modMine:FBpp0070000', ' MD5=19dfee3c4d8ec74f121a5b5f7f7682e1', ' length=786', ' release=r6.11', ' species=Dmel', '']
+				
+				#quit()
+			#>FBpp0070000 type=protein; loc=X:join(19963955..19964071,19964782..19964944,19965006..19965126,19965197..19965511,19965577..19966071,19966183..19967012,19967081..19967223,19967284..19
+#967460); ID=FBpp0070000; name=Nep3-PA; parent=FBgn0031081,FBtr0070000; dbxref=FlyBase:FBpp0070000,FlyBase_Annotation_IDs:CG9565-PA,GB_protein:AAF45370.2,REFSEQ:NP_523417,GB_protein:AAF45370,UniProt/TrEMBL:Q9W5Y0,FlyMine:FBpp0070000,modMine:FBpp0070000; MD5=19dfee3c4d8ec74f121a5b5f7f7682e1; length=786; release=r6.11; species=Dmel; 
+			
+			else:
+				continue
+		return gn_to_pp_dict
 
 def mel_gff_list():
 	"""This function takes the modified gff3 file and creates a list"""
-	mod_gff3 = sys.argv[1]
+	mod_gff3 = sys.argv[3]
 	with open(mod_gff3, 'r') as f:
 		gff = [line.strip().split('\t') for line in f]
 		f.close()
@@ -102,137 +153,11 @@ def mel_gene_set(dict): # this uses the flanking genes, specifically
 			mel_gene_set.add(mg)
 	return mel_gene_set
 
-def map_mel_gene_to_ortho_gene(set):
-	"""This function maps other another species' orthologs to dmel genes"""
-	mapping = dict()
-	with open(sys.argv[2], 'r') as orthos: #this is finding the  ortho_gene_coords
-		for line in orthos:
-			if not line.startswith('#') and not line.startswith('\n'):
-				data = line.split ('\t')
-				###switch this to "fly" sys.argv
-				if sys.argv[3] in data[6]:
-					if data[0] in mel_genes_obj:
-						#print data
-						coord = data[8].split("..")
-						mapping[data[0]] = data[5], data[7], coord[0], coord[1]
-						#exit()
-	return mapping
-	# mapping ex/
-#FBgn0001142': ('FBgn0171629', 'scaffold_14', '131505', '132704'), 
-#'FBgn0002121': ('FBgn0171620', 'scaffold_14', '19278', '25107'), 
-
-def ortho_up_down_dict(fbgn_id_dict, map):
-	"""This function maps the mel lncRNA to its upstream and downstream orthologs in a different species"""
-	rna_ortho = dict()
-	for k, v in fbgn_id_dict.iteritems():
-		before, after = [], []
-		for i, gene1 in enumerate(v[0]):
-			ortho_gene = map.get(gene1, None) # get returns a value for a given key
-			if ortho_gene is None:
-				continue
-			if i <= window_length:
-				before.append(ortho_gene)
-				
-		for i, gene2 in enumerate(v[1]):
-			ortho_gene = map.get(gene2, None)
-			if ortho_gene is None:
-				continue
-			if i <= window_length:
-				after.append(ortho_gene)
-		rna_ortho[k] = (before,after)
-	return rna_ortho
-	#'FBtr0344032': ([('FBgn0171613', 'scaffold_14', '122003', '129535'), ('FBgn0171614', 'scaffold_14', '115786', '118485')], [('FBgn0171629', 'scaffold_14', '131505', '132704'), ('FBgn0171610', 'scaffold_14', '138261', '139727')]), 
-
-def ortho_final_coord(ortho_dict):#rna_ortho_dict,
-	"""This function finds the end of the front gene ortholog and the front of the back gene ortholog, to give a dictionary with a putative start and putative stop"""
-	final_coord_dict = dict()
-	for k, v in ortho_dict.iteritems():
-		upstream = v[0]
-		downstream = v[1]
-		uscafs = set()
-		dscafs = set()
-		for gene in upstream:
-			uscafs.add(gene[1])
-		for gene in downstream:
-			dscafs.add(gene[1])
-		common_scaf = uscafs.intersection(dscafs)
-		for x in common_scaf:
-			upos = []
-			for gene in upstream:
-				if gene[1] == x:
-					upos.append(gene[2])
-					upos.append(gene[3])
-			dpos = []
-			for gene in downstream:
-				if gene[1] == x:
-					dpos.append(gene[2])
-					dpos.append(gene[3])
-		#ex upos : ['3815439', '3822866', '3808823', '3809996']
-		#ex dbos : ['3823313', '3826021', '3826740', '3828621', '3829156', '3829994', '3831313', '3855168']
-		upos_num = [int(n) for n in upos]
-		dpos_num = [int(n) for n in dpos]
-		merged_pos = upos_num + dpos_num
-
-		final_coord_dict[k] = [x, min(merged_pos), max(merged_pos)]
-
-		
-	return final_coord_dict
-		#'FBtr0342867': ['scaffold_0', '3442611', '3447776'], 'FBtr0342862': ['scaffold_0', '3442611', '3447776']
 	
-def ortho_read_scaffolds():
-	"""Need to check this works"""
-	user_input = raw_input("Enter the path of the scaffold file: ")
-	assert os.path.exists(user_input), "I did not find the file at, "+str(user_input)
-	print ("Hooray we found your file!")
-	#print "I am in karl_read"
-	with open(user_input, 'r+') as species:
-		key = ''
-		sequence = []
-		scaffold = dict()
-		for line in species:
-			if line.startswith('>'):
-				if key and sequence:
-					scaffold[key] = ''.join(sequence)
-				key = line.split(' ')[0][1:]
-				sequence = []
-			else:
-				sequence.append(line.rstrip())
-		scaffold[key] = ''.join(sequence)
-	return scaffold
+pp_dict = find_best_hit()
+gene_to_prot =match_pp_to_gn()
+print gene_to_prot
 
-def mel_ncrna_seq_dict():
-	"""This reads in flybase file and makes a dictionary of ncRNA id (key) and sequence (value)"""
-	with open('flybase/dmel-all-ncRNA-r6.11.fasta', 'r+') as file:
-		key = ''
-		sequence = []
-		ncRNA = dict()
-		for line in file:
-			if line.startswith('>'):
-				if key and sequence:
-					ncRNA[key] = ''.join(sequence)
-				key = line.split(' ')[0][1:]
-				sequence = []
-			else:
-				sequence.append(line.rstrip())
-		ncRNA[key] = ''.join(sequence)
-	return ncRNA
-	
-def mel_ortho_output_sequence(scaf_dict, coord_dict, mel_seqs):
-	"""This print the sequence of putative lncRNA in non-mel species, using start and stop and scaffold"""
-	#make out file to be written to
-	out_file = open('out_flybase_%s_ncRNA_mel_and_ortho_seq_%s.txt' %(fly, today), 'w')
-	for k, v in coord_dict.iteritems():
-		if v[1] < v[2]:
-			start = int(v[1])+1
-			end = int(v[2])+1
-		if v[2] < v[1]:
-			start = int(v[2])+1
-			end = int(v[1])+1
-		out_file.write(">%s;dmel\n%s\n" %(k, mel_seqs[k]))
-		out_file.write(">%s;%s\n%s\n" %(k, fly, scaf_dict[v[0]][start:end]))
-	out_file.close()
-
-### making sure the functions are executed in the right order
 mel_gff_obj = mel_gff_list()
 #print gff_obj
 mel_ncRNA_obj = mel_ncRNA_list(mel_gff_obj)
@@ -240,20 +165,6 @@ mel_ncRNA_obj = mel_ncRNA_list(mel_gff_obj)
 mel_ud_gn_dict_obj =mel_ncRNA_up_down_dict(mel_ncRNA_obj, mel_gff_obj, window_length)
 #print fbgn_dict_obj
 mel_genes_obj = mel_gene_set(mel_ud_gn_dict_obj)
-#print mel_genes_obj
-ortho_map = map_mel_gene_to_ortho_gene(mel_genes_obj)
-#print ortho_map
-ortho_ud_gn_dict = ortho_up_down_dict(mel_ud_gn_dict_obj, ortho_map)
-#print rna_ortho_dict
-#python lncRNA_annotation_doc/step_by_step_flanking.py out/1_prac_ncRNA_and_genes.txt 
-ortho_final_coord_obj = ortho_final_coord(ortho_ud_gn_dict)
-#print final_coord_obj
-ortho_scaff_dict = ortho_read_scaffolds()
 
-mel_rna_seqs_obj = mel_ncrna_seq_dict()
-
-mel_ortho_output_sequence(ortho_scaff_dict, ortho_final_coord_obj, mel_rna_seqs_obj)
-
-#flybase/dsec-all-chromosome-r1.3.fasta
-
-#lncRNA_annotation_doc/flybase_flanking_genes.py out/1_dmel_genes_ncRNA_2016-06-07_out.txt flybase/gene_orthologs_fb_2016_03.tsv Dsec
+for i in mel_genes_obj:
+	gene_to_prot[i]

@@ -12,14 +12,15 @@ f = open(file_to_split, 'r')
 for line in f:
     if found:
         #print line
-        sequence += line.strip()
         if line.startswith('>'):
             break
+        sequence += line.strip()
+        
     else:
         if line.strip().startswith('>'+scaffold):
             found = True
-            print "This is the line I wanted!!!!!!!!!!!!", line
-print "\n\n"
+            print "This is the line I wanted!!!!!!!!!!!!\n", line
+print "\n"
 print "*"*60
 
 print "This is sequence:\n", sequence
