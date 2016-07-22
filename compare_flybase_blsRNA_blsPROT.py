@@ -1,92 +1,21 @@
-# this code is a simple function to read in blast results (in format 6) and then sort them
-#
-
-
-
+#need up to ortho final coord
 import sys
+import datetime
+import itertools
+import os
 
-
-#this works so far
-def find_best_hit():
-	"""This reads in your protein blast output (in format 6) and gives you the data for the best hit per protein. Makes a dictionary."""
-	blast_file = sys.argv[1]
-
-	#initiate dictionary
-	protein_dict = {}
-
-
-	with open(blast_file, 'rU') as f:
-		for line in f:
-			#print line
-			data = line.strip().split('\t')
-			# data = ['FBpp0070000', 'scaffold_8', '72.868', '774', '87', '12', '135', '786', '2083229', '2085547', '0.0', '1076']
-			key = data[0]
-			#print key
-			if key in protein_dict:
-				#print protein_dict[key][9]
-				if float(protein_dict[key][3]) < float(data[10]):
-					continue
-				if float(protein_dict[key][3])> float(data[10]):
-					protein_dict[key] = [data[1], data[8], data[9], data[10]]
-			else:
-				protein_dict[key]= [data[1], data[8], data[9], data[10]]
-		return protein_dict
-		#'FBpp0088105': ['scaffold_1', '608944', '609336', '1.11e-43'], 
-		#'FBpp0298338': ['scaffold_1', '10928169', '10930274', '0.0'], 
-		#'FBpp0298339': ['scaffold_1', '10430434', '10430036', '8.70e-72'], 
-		#'FBpp0298337': ['scaffold_0', '8673122', '8673481', '1.83e-94']
-
-def match_pp_to_gn():
-	"""This has to read in the stupid protein files, and find the gn name associated with the protein"""
-	pp_to_gn_dict = {}
-	protein = sys.argv[2]
-	with open(protein, 'r') as p:
-		for line in p:
-			if line.startswith('>'):
-				data = line.strip().split(';')
-				#print data
-				pp = data[2].split('=')[1]
-				gn = data[4].split(',')[0].split('=')[1]
-				#parent=FBgn0031081,FBtr0070000
-				#print pp
-				#print gn
-				pp_to_gn_dict[pp]=gn
-				#ID=FBpp0070000
-				#  [0]                                 [1]                                                                                                                                                                 [2]*                    [3]              [4]*
-				#['>FBpp0070000 type=protein', ' loc=X:join(19963955..19964071,19964782..19964944,19965006..19965126,19965197..19965511,19965577..19966071,19966183..19967012,19967081..19967223,19967284..19967460)', ' ID=FBpp0070000', ' name=Nep3-PA', ' parent=FBgn0031081,FBtr0070000', ' dbxref=FlyBase:FBpp0070000,FlyBase_Annotation_IDs:CG9565-PA,GB_protein:AAF45370.2,REFSEQ:NP_523417,GB_protein:AAF45370,UniProt/TrEMBL:Q9W5Y0,FlyMine:FBpp0070000,modMine:FBpp0070000', ' MD5=19dfee3c4d8ec74f121a5b5f7f7682e1', ' length=786', ' release=r6.11', ' species=Dmel', '']
-				
-				#quit()
-			#>FBpp0070000 type=protein; loc=X:join(19963955..19964071,19964782..19964944,19965006..19965126,19965197..19965511,19965577..19966071,19966183..19967012,19967081..19967223,19967284..19
-#967460); ID=FBpp0070000; name=Nep3-PA; parent=FBgn0031081,FBtr0070000; dbxref=FlyBase:FBpp0070000,FlyBase_Annotation_IDs:CG9565-PA,GB_protein:AAF45370.2,REFSEQ:NP_523417,GB_protein:AAF45370,UniProt/TrEMBL:Q9W5Y0,FlyMine:FBpp0070000,modMine:FBpp0070000; MD5=19dfee3c4d8ec74f121a5b5f7f7682e1; length=786; release=r6.11; species=Dmel; 
-			
-			else:
-				continue
-		return pp_to_gn_dict
-		#'FBpp0088107': 'FBgn0033139', 
-		#'FBpp0088104': 'FBgn0016032', 
-		#'FBpp0088105': 'FBgn0033135', 
-		#'FBpp0298338': 'FBgn0263113', 
-		
-def dmelgn_to_ortho(p2g_dict, best_hit_dict):
-	"""This function takes pp_to_gn_dict and protein_dict and makes dmelgn_to_ortho_dict. It links the dmel gn to the best hit."""
-	dmelgn_to_ortho = {}
-	for k,v in best_hit_dict.iteritems():
-		#print "this is k", k
-		new_key = p2g_dict[k]
-		#print "This is new_key", new_key
-		dmelgn_to_ortho[new_key]= [best_hit_dict[k][0],best_hit_dict[k][1], best_hit_dict[k][2]]
-	return dmelgn_to_ortho
-	#'FBgn0051014': ['scaffold_4', '5150977', '5150084'], 
-	#'FBgn0051013': ['scaffold_4', '5297590', '5296811'], 
-	#'FBgn0051010': ['scaffold_4', '5350617', '5349826']
-		
-	
-
-
+today = datetime.date.today()
+window_length = 4
+fly = sys.argv[3]
+#sys.argv[1] mel_gff_list
+#sys.argv[2] ortho_file
+#sys.argv[4] ncRNA blast file
+#sys.argv[5] protein blast file
+#sys.argv[6] protein fasta file
 
 def mel_gff_list():
 	"""This function takes the modified gff3 file and creates a list"""
-	mod_gff3 = sys.argv[3]
+	mod_gff3 = sys.argv[1]
 	with open(mod_gff3, 'r') as f:
 		gff = [line.strip().split('\t') for line in f]
 		f.close()
@@ -178,6 +107,84 @@ def mel_gene_set(dict): # this uses the flanking genes, specifically
 			mel_gene_set.add(mg)
 	return mel_gene_set
 
+def map_mel_gene_to_ortho_gene(set):
+	"""This function maps other another species' orthologs to dmel genes"""
+	mapping = dict()
+	with open(sys.argv[2], 'r') as orthos: #this is finding the  ortho_gene_coords
+		for line in orthos:
+			if not line.startswith('#') and not line.startswith('\n'):
+				data = line.split ('\t')
+				###switch this to "fly" sys.argv
+				if sys.argv[3] in data[6]:
+					if data[0] in set:#changed this
+						#print data
+						coord = data[8].split("..")
+						mapping[data[0]] = data[5], data[7], coord[0], coord[1]
+						#exit()
+	return mapping
+	# mapping ex/
+#FBgn0001142': ('FBgn0171629', 'scaffold_14', '131505', '132704'), 
+#'FBgn0002121': ('FBgn0171620', 'scaffold_14', '19278', '25107'), 
+
+def ortho_up_down_dict(fbgn_id_dict, map):
+	"""This function maps the mel lncRNA to its upstream and downstream orthologs in a different species"""
+	rna_ortho = dict()
+	for k, v in fbgn_id_dict.iteritems():
+		before, after = [], []
+		for i, gene1 in enumerate(v[0]):
+			ortho_gene = map.get(gene1, None) # get returns a value for a given key
+			if ortho_gene is None:
+				continue
+			if i <= window_length:
+				before.append(ortho_gene)
+				
+		for i, gene2 in enumerate(v[1]):
+			ortho_gene = map.get(gene2, None)
+			if ortho_gene is None:
+				continue
+			if i <= window_length:
+				after.append(ortho_gene)
+		rna_ortho[k] = (before,after)
+	return rna_ortho
+	#'FBtr0344032': ([('FBgn0171613', 'scaffold_14', '122003', '129535'), ('FBgn0171614', 'scaffold_14', '115786', '118485')], [('FBgn0171629', 'scaffold_14', '131505', '132704'), ('FBgn0171610', 'scaffold_14', '138261', '139727')]), 
+
+def ortho_final_coord(ortho_dict):#rna_ortho_dict,
+	"""This function finds the end of the front gene ortholog and the front of the back gene ortholog, to give a dictionary with a putative start and putative stop"""
+	final_coord_dict = dict()
+	for k, v in ortho_dict.iteritems():
+		upstream = v[0]
+		downstream = v[1]
+		uscafs = set()
+		dscafs = set()
+		for gene in upstream:
+			uscafs.add(gene[1])
+		for gene in downstream:
+			dscafs.add(gene[1])
+		common_scaf = uscafs.intersection(dscafs)
+		for x in common_scaf:
+			upos = []
+			for gene in upstream:
+				if gene[1] == x:
+					upos.append(gene[2])
+					upos.append(gene[3])
+			dpos = []
+			for gene in downstream:
+				if gene[1] == x:
+					dpos.append(gene[2])
+					dpos.append(gene[3])
+		#ex upos : ['3815439', '3822866', '3808823', '3809996']
+		#ex dbos : ['3823313', '3826021', '3826740', '3828621', '3829156', '3829994', '3831313', '3855168']
+		upos_num = [int(n) for n in upos]
+		dpos_num = [int(n) for n in dpos]
+		merged_pos = upos_num + dpos_num
+
+		final_coord_dict[k] = [x, min(merged_pos), max(merged_pos)]
+
+		
+	return final_coord_dict
+		#'FBtr0342867': ['scaffold_0', '3442611', '3447776'], 'FBtr0342862': ['scaffold_0', '3442611', '3447776']
+	
+	
 def blast_coord(coord_dict):
 	"""This function will find all of the hits of dmel ncRNA against non-mel genome and return the best scaffold and the start and stop"""
 	file = sys.argv[4]
@@ -212,7 +219,8 @@ def blast_coord(coord_dict):
 				sstart.append(int(list[7]))
 				send.append(int(list[8]))
 			#here, since we are finding it compared to the lncRNA, we want more buffer, so the lowest and highest between up and down
-			final_blast_dict[k] = uscafs, min(sstart), max(send)
+			scaf= [i for i in uscafs]
+			final_blast_dict[k] = scaf[0], min(sstart), max(send)
 			#want small, large
 			#print type(list[7])
 			#print type(list[8])
@@ -222,98 +230,157 @@ def blast_coord(coord_dict):
 			#	print k, max(list[7]), min(list[8])
 
 	return blast_coord_dict, final_blast_dict
-
-
-def ortho_final_coord(ortho_dict):#rna_ortho_dict,
-	"""This function finds the end of the front gene ortholog and the front of the back gene ortholog, to give a dictionary with a putative start and putative stop"""
-	final_coord_dict = dict()
-	for k, v in ortho_dict.iteritems():
-		upstream = v[0]
-		downstream = v[1]
-		uscafs = set()
-		dscafs = set()
-		for gene in upstream:
-			uscafs.add(gene[1])
-		for gene in downstream:
-			dscafs.add(gene[1])
-		#print "up", uscafs
-		#print "down", dscafs
-		common_scaf = uscafs.intersection(dscafs)
-		#different_scaf = uscafs.difference(dscafs)
-		#print "common", common_scaf
-		#if len(different_scaf) >= 1:
-		#	print "different", different_scaf, k
-		for x in common_scaf:
-			#print "This is x", x
-			upos = []
-			for gene in upstream:
-				#print "This is gene", gene
-				if gene[1] == x:
-					#print "This is gene[1]", gene[1]
-					#print "This is common_scaf", common_scaf
-					#upos.append(gene[0])
-					upos.append(gene[2])
-					upos.append(gene[3])
-					#print upos
-			dpos = []
-			for gene in downstream:
-				if gene[1] == x:
-					#dpos.append(gene[0])
-					dpos.append(gene[2])
-					dpos.append(gene[3])
-		#print "This is upos", upos
-		#print "This is upos[1:]", upos[1:]
-		#print "This is dpos", dpos
-		#ex upos : ['3815439', '3822866', '3808823', '3809996']
-		#ex dbos : ['3823313', '3826021', '3826740', '3828621', '3829156', '3829994', '3831313', '3855168']
-		#quit()
-		#final_coord_dict[k] = [x, max(upos), min(dpos)]
-		#print type(upos[1]), its a string, want int!
-		upos_num = [int(n) for n in upos]
-		#print "This is upos", upos
-		#print "this is upos_num", upos_num
-		dpos_num = [int(n) for n in dpos]
-		merged_pos = upos_num + dpos_num
-		print "merged", merged_pos
-		print min(merged_pos)
-		final_coord_dict[k] = [x, min(merged_pos), max(merged_pos)]
-		print k, final_coord_dict[k]
-		#avg_upos = sum(upos_num)/len(upos_num)
-		#avg_dpos = sum(dpos_num)/len(dpos_num)
-		#print k
-		#print upos, dpos
-		#print max(upos_num), min(dpos_num), min(upos_num), max(upos_num)
-		#if max(upos_num) < min(dpos_num):
-		#	final_coord_dict[k] = [x, min(upos_num), max(dpos_num)]
-		#elif min(upos_num) > max(upos_num):
-		#	final_coord_dict[k] = [x, min(dpos_num), max(upos_num)]
-		#print k, x, max(upos), min(dpos)
-	return final_coord_dict
-		#'FBtr0342867': ['scaffold_0', '3442611', '3447776'], 'FBtr0342862': ['scaffold_0', '3442611', '3447776']
 	
+#this works so far
+def find_best_hit():
+	"""This reads in your protein blast output (in format 6) and gives you the data for the best hit per protein. Makes a dictionary."""
+	blast_file = sys.argv[5]
+
+	#initiate dictionary
+	protein_dict = {}
 
 
+	with open(blast_file, 'rU') as f:
+		for line in f:
+			#print line
+			data = line.strip().split('\t')
+			# data = ['FBpp0070000', 'scaffold_8', '72.868', '774', '87', '12', '135', '786', '2083229', '2085547', '0.0', '1076']
+			key = data[0]
+			#print key
+			if key in protein_dict:
+				#print protein_dict[key][9]
+				if float(protein_dict[key][3]) < float(data[10]):
+					continue
+				if float(protein_dict[key][3])> float(data[10]):
+					protein_dict[key] = [data[1], data[8], data[9], data[10]]
+			else:
+				protein_dict[key]= [data[1], data[8], data[9], data[10]]
+		return protein_dict
+		#'FBpp0088105': ['scaffold_1', '608944', '609336', '1.11e-43'], 
+		#'FBpp0298338': ['scaffold_1', '10928169', '10930274', '0.0'], 
+		#'FBpp0298339': ['scaffold_1', '10430434', '10430036', '8.70e-72'], 
+		#'FBpp0298337': ['scaffold_0', '8673122', '8673481', '1.83e-94']
+
+def match_pp_to_gn():
+	"""This has to read in the stupid protein files, and find the gn name associated with the protein"""
+	pp_to_gn_dict = {}
+	protein = sys.argv[6]
+	with open(protein, 'r') as p:
+		for line in p:
+			if line.startswith('>'):
+				data = line.strip().split(';')
+				#print data
+				pp = data[2].split('=')[1]
+				gn = data[4].split(',')[0].split('=')[1]
+				#parent=FBgn0031081,FBtr0070000
+				#print pp
+				#print gn
+				pp_to_gn_dict[pp]=gn
+				#ID=FBpp0070000
+				#  [0]                                 [1]                                                                                                                                                                 [2]*                    [3]              [4]*
+				#['>FBpp0070000 type=protein', ' loc=X:join(19963955..19964071,19964782..19964944,19965006..19965126,19965197..19965511,19965577..19966071,19966183..19967012,19967081..19967223,19967284..19967460)', ' ID=FBpp0070000', ' name=Nep3-PA', ' parent=FBgn0031081,FBtr0070000', ' dbxref=FlyBase:FBpp0070000,FlyBase_Annotation_IDs:CG9565-PA,GB_protein:AAF45370.2,REFSEQ:NP_523417,GB_protein:AAF45370,UniProt/TrEMBL:Q9W5Y0,FlyMine:FBpp0070000,modMine:FBpp0070000', ' MD5=19dfee3c4d8ec74f121a5b5f7f7682e1', ' length=786', ' release=r6.11', ' species=Dmel', '']
+				
+				#quit()
+			#>FBpp0070000 type=protein; loc=X:join(19963955..19964071,19964782..19964944,19965006..19965126,19965197..19965511,19965577..19966071,19966183..19967012,19967081..19967223,19967284..19
+#967460); ID=FBpp0070000; name=Nep3-PA; parent=FBgn0031081,FBtr0070000; dbxref=FlyBase:FBpp0070000,FlyBase_Annotation_IDs:CG9565-PA,GB_protein:AAF45370.2,REFSEQ:NP_523417,GB_protein:AAF45370,UniProt/TrEMBL:Q9W5Y0,FlyMine:FBpp0070000,modMine:FBpp0070000; MD5=19dfee3c4d8ec74f121a5b5f7f7682e1; length=786; release=r6.11; species=Dmel; 
+			
+			else:
+				continue
+		return pp_to_gn_dict
+		#'FBpp0088107': 'FBgn0033139', 
+		#'FBpp0088104': 'FBgn0016032', 
+		#'FBpp0088105': 'FBgn0033135', 
+		#'FBpp0298338': 'FBgn0263113', 
+		
+def dmelgn_to_ortho(p2g_dict, best_hit_dict):
+	"""This function takes pp_to_gn_dict and protein_dict and makes dmelgn_to_ortho_dict. It links the dmel gn to the best hit."""
+	dmelgn_to_ortho = {}
+	for k,v in best_hit_dict.iteritems():
+		#print "this is k", k
+		new_key = p2g_dict[k]
+		#print "This is new_key", new_key
+		dmelgn_to_ortho[new_key]= new_key, best_hit_dict[k][0],best_hit_dict[k][1], best_hit_dict[k][2]
+	return dmelgn_to_ortho
+	#'FBgn0051014': ['scaffold_4', '5150977', '5150084'], 
+	#'FBgn0051013': ['scaffold_4', '5297590', '5296811'], 
+	#'FBgn0051010': ['scaffold_4', '5350617', '5349826']
+		
+
+
+
+### making sure the functions are executed in the right order
+mel_gff_obj = mel_gff_list()
+#print gff_obj
+mel_ncRNA_obj = mel_ncRNA_list(mel_gff_obj)
+#print ncRNA_obj
+mel_ud_gn_dict_obj =mel_ncRNA_up_down_dict(mel_ncRNA_obj, mel_gff_obj, window_length)
+#print fbgn_dict_obj
+mel_genes_obj = mel_gene_set(mel_ud_gn_dict_obj)
+#print mel_genes_obj
+ortho_map = map_mel_gene_to_ortho_gene(mel_genes_obj)
+#print ortho_map
+ortho_ud_gn_dict = ortho_up_down_dict(mel_ud_gn_dict_obj, ortho_map)
+#print rna_ortho_dict
+#python lncRNA_annotation_doc/step_by_step_flanking.py out/1_prac_ncRNA_and_genes.txt 
+ortho_final_coord_obj = ortho_final_coord(ortho_ud_gn_dict)
+#print ortho_final_coord_obj
+#'FBtr0342866': ['scaffold_109', 4495, 32697]
+bls_dict, final_bls_dict =blast_coord(ortho_final_coord_obj)
+#print final_bls_dict
+#'FBtr0347256': ('scaffold_0', 3444321, 3443915)
+#'FBtr0300137': (set(['scaffold_20']), 786703, 786623)
 pp_dict = find_best_hit()
 #print pp_dict
 
 #quit()
-gene_to_prot =match_pp_to_gn()
-#print gene_to_prot
+prot_to_gene =match_pp_to_gn()
+#print prot_to_gene
 #quit()
-
-mel_to_ortho_map =dmelgn_to_ortho(gene_to_prot, pp_dict)
+mel_to_ortho_map =dmelgn_to_ortho(prot_to_gene, pp_dict)
 #print mel_to_ortho_map
-quit()
+new_ortho_ud_gn_dict = ortho_up_down_dict(mel_ud_gn_dict_obj, mel_to_ortho_map)
+#print new_ortho_ud_gn_dict
+new_ortho_final_coord_obj = ortho_final_coord(new_ortho_ud_gn_dict)
+#print new_ortho_final_coord_obj
+#'FBtr0342866': ['scaffold_109', 9927, 32697]
 
-#mel_gff_obj = mel_gff_list()
-#print gff_obj
-#mel_ncRNA_obj = mel_ncRNA_list(mel_gff_obj)
-#print ncRNA_obj
-#mel_ud_gn_dict_obj =mel_ncRNA_up_down_dict(mel_ncRNA_obj, mel_gff_obj, window_length)
-#print fbgn_dict_obj
-#mel_genes_obj = mel_gene_set(mel_ud_gn_dict_obj)
-#bls_dict, final_bls_dict =blast_coord(final_coord_obj)
+#print ortho_final_coord_obj
+#'FBtr0342866': ['scaffold_109', 4495, 32697]
+#print final_bls_dict
+#'FBtr0300137': (set(['scaffold_20']), 786703, 786623)
+#print new_ortho_final_coord_obj
+#'FBtr0342866': ['scaffold_109', 9927, 32697]
+out_file = open('out_compare_%s_ncRNAbls_flybase_proteinbls_%s.txt' %(fly, today), 'w')
+ortho_count = 0
+bls_ortho_match = 0
+keys_tried = 0
+key_errors = 0
+for k,v in ortho_final_coord_obj.iteritems():
+	try:
+		keys_tried = keys_tried + 1
+		out_file.write("%s\tncRNAbls:%s\tortho:%s\tprotbls:%s\n" %(k, final_bls_dict[k][0], ortho_final_coord_obj[k][0], new_ortho_final_coord_obj[k][0]))
+		print k, v, final_bls_dict[k], new_ortho_final_coord_obj[k]
+		#print ortho_final_coord_obj[k][0]
+		#print new_ortho_final_coord_obj[k][0]
+		#print final_bls_dict[k][0]
+		if ortho_final_coord_obj[k][0] == new_ortho_final_coord_obj[k][0]:
+			ortho_count = ortho_count + 1
+		if ortho_final_coord_obj[k][0] == new_ortho_final_coord_obj[k][0] and ortho_final_coord_obj[k][0] == final_bls_dict[k][0]:
+			bls_ortho_match = bls_ortho_match + 1
+	except KeyError:
+		print "k, sucks here", k
+		key_errors = key_errors + 1
+		out_file.write("%s\tKEY ERROR\n" %k)
+	#out_file.write("%s\tncRNAbls:%s\tortho:%s\tprotbls:%s\b" %(k, final_bls_dict[k][0], ortho_final_coord_obj[k][0], new_ortho_final_coord_obj[k][0]))
 	
+out_file.close()
 
-#for i in mel_genes_obj:
-#	gene_to_prot[i]
+print fly
+print "keys_tried", keys_tried
+print "bls_ortho_match", bls_ortho_match
+print "ortho_count", ortho_count
+print "key_errors", key_errors
+
+#python ../../compare_flybase_blsRNA_blsPROT.py out/1_dmel_genes_ncRNA_2016-06-07_out.txt  flybase/gene_orthologs_fb_2016_03.tsv Dsec out/dmel-on-dsec-2.blstn ../../tblstn-dmel-on-dsec.tblstn flybase/dmel-all-translation-r6.11.fasta
+
+
