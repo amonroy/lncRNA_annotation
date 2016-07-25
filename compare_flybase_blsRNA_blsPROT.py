@@ -161,24 +161,36 @@ def ortho_final_coord(ortho_dict):#rna_ortho_dict,
 		for gene in downstream:
 			dscafs.add(gene[1])
 		common_scaf = uscafs.intersection(dscafs)
-		for x in common_scaf:
-			upos = []
-			for gene in upstream:
-				if gene[1] == x:
-					upos.append(gene[2])
-					upos.append(gene[3])
-			dpos = []
-			for gene in downstream:
-				if gene[1] == x:
-					dpos.append(gene[2])
-					dpos.append(gene[3])
+		
+		#I added this part later
+		if len(common_scaf) >= 1:
+			print common_scaf
+			for x in common_scaf:
+				upos = []
+				for gene in upstream:
+					if gene[1] == x:
+						upos.append(gene[2])
+						upos.append(gene[3])
+				dpos = []
+				for gene in downstream:
+					if gene[1] == x:
+						dpos.append(gene[2])
+						dpos.append(gene[3])
 		#ex upos : ['3815439', '3822866', '3808823', '3809996']
 		#ex dbos : ['3823313', '3826021', '3826740', '3828621', '3829156', '3829994', '3831313', '3855168']
-		upos_num = [int(n) for n in upos]
-		dpos_num = [int(n) for n in dpos]
-		merged_pos = upos_num + dpos_num
+		#try:
+			upos_num = [int(n) for n in upos]
+			dpos_num = [int(n) for n in dpos]
+			merged_pos = upos_num + dpos_num
+			final_coord_dict[k] = [x, min(merged_pos), max(merged_pos)]
+		#except UnboundLocalError:
+			#continue
+		else:
+			continue
+		#dpos_num = [int(n) for n in dpos]
+		#merged_pos = upos_num + dpos_num
 
-		final_coord_dict[k] = [x, min(merged_pos), max(merged_pos)]
+		#final_coord_dict[k] = [x, min(merged_pos), max(merged_pos)]
 
 		
 	return final_coord_dict
@@ -312,9 +324,9 @@ def dmelgn_to_ortho(p2g_dict, best_hit_dict):
 mel_gff_obj = mel_gff_list()
 #print gff_obj
 mel_ncRNA_obj = mel_ncRNA_list(mel_gff_obj)
-#print ncRNA_obj
+#print mel_ncRNA_obj
 mel_ud_gn_dict_obj =mel_ncRNA_up_down_dict(mel_ncRNA_obj, mel_gff_obj, window_length)
-#print fbgn_dict_obj
+print mel_ud_gn_dict_obj
 mel_genes_obj = mel_gene_set(mel_ud_gn_dict_obj)
 #print mel_genes_obj
 ortho_map = map_mel_gene_to_ortho_gene(mel_genes_obj)
@@ -322,6 +334,13 @@ ortho_map = map_mel_gene_to_ortho_gene(mel_genes_obj)
 ortho_ud_gn_dict = ortho_up_down_dict(mel_ud_gn_dict_obj, ortho_map)
 #print rna_ortho_dict
 #python lncRNA_annotation_doc/step_by_step_flanking.py out/1_prac_ncRNA_and_genes.txt 
+## it got stuck here
+#print ortho_ud_gn_dict
+#'FBtr0344032': ([('FBgn0171613', 'scaffold_14', '122003', '129535'), ('FBgn0171614', 'scaffold_14', '115786', '118485')], [('FBgn0171629', 'scaffold_14', '131505', '132704'), ('FBgn0171610', 'scaffold_14', '138261', '139727')])
+
+#'FBtr0343760': ([('FBgn0097470', 'scaffold_13417', '2160760', '2167561'), ('FBgn0097471', 'scaffold_13417', '2182014', '2185629'), ('FBgn0097226', 'scaffold_13417', '2185724', '2194327')], [('FBgn0097468', 'scaffold_13417', '2076736', '2099865')]), 
+#'FBtr0343761': ([], [('FBgn0096860', 'scaffold_12613', '179187', '182016'), ('FBgn0096613', 'scaffold_12613', '84836', '98148')]), 
+#'FBtr0343762': ([('FBgn0093986', 'scaffold_13340', '8610832', '8646188'), ('FBgn0093987', 'scaffold_13340', '8593576', '8598181'), ('FBgn0094483', 'scaffold_13340', '875503', '876097')], [('FBgn0095064', 'scaffold_13340', '8644413', '8656575')])}
 ortho_final_coord_obj = ortho_final_coord(ortho_ud_gn_dict)
 #print ortho_final_coord_obj
 #'FBtr0342866': ['scaffold_109', 4495, 32697]
@@ -382,5 +401,7 @@ print "ortho_count", ortho_count
 print "key_errors", key_errors
 
 #python ../../compare_flybase_blsRNA_blsPROT.py out/1_dmel_genes_ncRNA_2016-06-07_out.txt  flybase/gene_orthologs_fb_2016_03.tsv Dsec out/dmel-on-dsec-2.blstn ../../tblstn-dmel-on-dsec.tblstn flybase/dmel-all-translation-r6.11.fasta
+
+#python compare_flybase_blsRNA_blsPROT.py out/1_dmel_genes_ncRNA_2016-06-07_out.txt  flybase/gene_orthologs_fb_2016_03.tsv Dsec out/dmel-on-dsec-2.blstn ../../tblstn-dmel-on-dsec.tblstn flybase/dmel-all-translation-r6.11.fasta
 
 
