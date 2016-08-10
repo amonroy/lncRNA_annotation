@@ -116,8 +116,8 @@ def map_mel_gene_to_ortho_gene(set): #5_fun
 						yes_count = yes_count + 1
 					if data[0] not in set:
 						not_count = not_count + 1  
-	print "This is yes_count", yes_count
-	print "This is not_count", not_count
+	#print "This is yes_count", yes_count
+	#print "This is not_count", not_count
 	return mapping #5_obj
 	#'FBgn0085212': {'nonp': ['FBgn0167159', 'scaffold_3', '5320158', '5336608']}, 
 	#'FBgn0266101': {'FBgn0180013': ['FBgn0180013', 'scaffold_0', '1697815', '1706253'], 'nonp': ['FBgn0180014', 'scaffold_0', '1707282', '1708727']}	
@@ -217,7 +217,7 @@ def blast_coord(coord_dict):
 #this works so far
 def find_best_hit():
 	"""This reads in your protein blast output (in format 6) and gives you the data for the best hit per protein. Makes a dictionary."""
-	print "In find_best_hit()"
+	#print "In find_best_hit()"
 	blast_file = sys.argv[5]
 	protein_dict = {}
 	with open(blast_file, 'rU') as f:
@@ -376,6 +376,17 @@ print "bad_key_rna", bad_key_rna
 for j in mel_ncRNA_obj:
 	bad = False
 	i =j.split('=')[1]
+	score_list = list(ortho_ud_gn_dict[i][2])
+	if '1' not in score_list[:4]:
+		#print score_list
+		#print score_list[:4]
+		bad = True
+		print "%s had no upstream!" %i
+	if '1' not in score_list[4:]:
+		bad = True
+		#print score_list
+		#print score_list[4:]
+		print "%s had no downstream!" %i
 	if i not in ortho_final_coord_obj:
 		bad = True
 		print "%s did not have a common scaffold" %i
@@ -388,6 +399,7 @@ for j in mel_ncRNA_obj:
 	if i not in new_ortho_final_coord_obj:
 		bad = True
 		print "%s did not have a protein blast ortholog" %i
-	if bad:
+	if bad:		
 		print "ortholog_score:", ortho_ud_gn_dict[i][2]
 		print "location:", ncRNA_chrom[i]
+		print "%%%%" * 3
