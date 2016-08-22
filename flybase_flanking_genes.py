@@ -7,6 +7,20 @@ today = datetime.date.today()
 window_length = 4
 fly = sys.argv[3]
 
+#"python lncRNA_annotation_doc/flybase_flanking_genes.py out/1_2_prac_ncRNA_and_genes.txt flybase/gene_orthologs_fb_2016_03.tsv Dsec flybase/dmel-all-ncRNA-r6.11.fasta flybase/dsec-all-chromosome-r1.3.fasta"
+
+#sys.argv[1] = gff (modified)
+#sys.argv[2] = flybase ortholg file, "gene_orthologs_fb_2016_03.tsv"
+#sys.argv[3] = fly name (ie Dsec, Dyak, ...)
+#sys.argv[4] =  ncRNA fasta file
+#sys.argv[5] = scaffold file, species specific
+#sys.argv[6] = ncRNA blast format 6
+#sys.argv[7] = protein blast format 6
+#sys.argv[8] = protein fasta
+
+#protein = sys.argv[6] (?) protein fasta, now sys,argv[8]
+#file = sys.argv[4] (ncRNA blast), now sys.argv[6]
+#blast_file = sys.argv[5] (protein blast), now sys.argv[7]
 
 def mel_gff_list():
 	"""This function takes the modified gff3 file and creates a list"""
@@ -16,29 +30,45 @@ def mel_gff_list():
 		f.close()
 	return gff
 	#gff_list ex/:
-	#['2L', 'FlyBase', 'gene', '7529', '9484', '.', '+', '.', 'ID=FBgn0031208;Name=CG11023;Ontology_term=SO:0000010,SO:0000087,GO:0016929,GO:0016926;Dbxref=FlyBase:FBan0011023,FlyBase_Annotation_IDs:CG11023,GB_protein:ACZ94128,GB_protein:AAO41164,GB:AI944728,GB:AJ564667,GB_protein:CAD92822,GB:BF495604,UniProt/TrEMBL:Q86BM6,INTERPRO:IPR003653,GB_protein:AGB92323,UniProt/TrEMBL:M9PAY1,OrthoDB7_Drosophila:EOG796K1P,OrthoDB7_Diptera:EOG7X1604,EntrezGene:33155,UniProt/TrEMBL:E1JHP8,UniProt/TrEMBL:Q6KEV3,OrthoDB7_Insecta:EOG7Q8QM7,OrthoDB7_Arthropoda:EOG7R5K68,OrthoDB7_Metazoa:EOG7D59MP,InterologFinder:33155,BIOGRID:59420,FlyAtlas:CG11023-RA,GenomeRNAi:33155;gbunit=AE014134;derived_computed_cyto=21A5-21A5'], ['2L', 'FlyBase', 'gene', '9839', '21376', '.', '-', '.', 'ID=FBgn0002121;Name=l(2)gl;fullname=lethal (2) giant larvae;Alias=Lgl,lgl,lethal giant larvae,lethal giant larve,lethal giant larva,lethal(2)giant larvae,Complementation group 2.1,Lethal Giant Larvae,dlgl,p127l(2)gl,LGL,l(2) giant larva,CG2671,L(2)GL,p127,l(2)giant larvae,D-LGL,l(2),gl,l[[2]]gl,l-gl,lethal-giant-larvae,Lethal giant larvae,Lethal (2) giant larvae,L(2)gl,Lethal (2) giant larva,Lethal-giant-larvae,MENE (2L)-B,lethal(2) giant larvae,p127[l(2)gl],lethal(2)-giant larvae,lethal-2-giant larvae,l(2) giant larvae,lethal- giant-larvae,Lethal(2)giant larvae,Lethal-2-giant larvae;Ontology_term=SO:0000010,SO:0000087,GO:0005578,GO:0005886,GO:0007269,GO:0016082,GO:0008021,GO:0008283,GO:0016334,GO:0016336,GO:0016333,GO:0016335,GO:0016327,GO:0005829,GO:0045175,GO:0016332,GO:0045184,GO:0007399,GO:0005938,GO:0005737,GO:0007179,GO:0045197,GO:0045196,GO:0002009,GO:0005918,GO:0008105,GO:0045167,GO:0008104,GO:0045746,GO:0007423,GO:0008285,GO:0001738,GO:0016323,GO:0007391,GO:0005856,GO:0030154,GO:0042127,GO:0005614,GO:0045159,GO:0035072,GO:0007559,GO:0045200,GO:0008360,GO:0019991,GO:0007406,GO:0051726,GO:0051668,GO:0007314,GO:0016325,GO:0030036,GO:0030863,GO:0035070,GO:0055059,GO:0035212,GO:0035293,GO:0090163,GO:0048730,GO:0000132,GO:0098725,GO:0060429,GO:0007293,GO:0045176,GO:0072697,GO:0000149,SO:0000548,GO:0005920,GO:0017022,GO:0004860,GO:0006469;Dbxref=FlyBase:FBan0002671,FlyBase_Annotation_IDs:CG2671,INTERPRO:IPR015943,GB_protein:AAN10503,GB_protein:AAG22256,GB_protein:AAN10502,GB_protein:AAN10501,GB_protein:AAF51570,GB_protein:AAG22255,INTERPRO:IPR017986,GB:AA246243,GB:AW942062,GB:AY051654,GB_protein:AAK93078,GB:BH809482,GB:CZ471313,GB:CZ482024,GB:CZ484691,GB:M17022,GB_protein:AAA28671,GB_protein:AAA28672,GB:X05426,GB_protein:CAA29007,UniProt/Swiss-Prot:P08111,INTERPRO:IPR000664,INTERPRO:IPR001680,INTERPRO:IPR013577,GB_protein:AGB92324,UniProt/TrEMBL:M9NCX1,UniProt/TrEMBL:M9PBJ2,OrthoDB7_Drosophila:EOG7CW2GT,OrthoDB7_Diptera:EOG7DRVK2,GB_protein:AFH03479,GB_protein:AFH03478,GB_protein:AFH03481,GB_protein:AFH03480,EntrezGene:33156,INTERPRO:IPR013905,BDGP_clone:PC00404,OrthoDB7_Insecta:EOG7SRGKH,OrthoDB7_Arthropoda:EOG7ZDD82,OrthoDB7_Metazoa:EOG79W94C,InterologFinder:33156,FlyAtlas:CG2671-RB,BIOGRID:59421,Fly-FISH:CG2671,GenomeRNAi:33156,INTERACTIVEFLY:/cytoskel/lethl2g1.htm;gbunit=AE014134;derived_computed_cyto=21A5-21A5'],
-	# ['2L', 'FlyBase', 'ncRNA', '286383', '288292', '.', '+', '.', 'ID=FBtr0347595;Name=CR46263-RA;Parent=FBgn0267996;Dbxref=FlyBase_Annotation_IDs:CR46263-RA;score_text=Weakly Supported;score=0'], ['2L', 'FlyBase', 'gene', '287252', '289144', '.', '-', '.', 'ID=FBgn0025686;Name=Amnionless;fullname=Amnionless ortholog;Alias=FBgn0031246,CG11592,CK02467,BEST:CK02467,dAMN,Amnionless;Ontology_term=SO:0000010,SO:0000087,GO:0046331,GO:0097206,GO:0016021,GO:0097017;Dbxref=FlyBase:FBan0011592,FlyBase_Annotation_IDs:CG11592,GB_protein:AAF51514,GB:AA141784,GB:CZ468687,UniProt/TrEMBL:Q9VPN2,GB_protein:AGB92350,OrthoDB7_Drosophila:EOG7CGKJK,EntrezGene:33199,BDGP_clone:IP03221,OrthoDB7_Diptera:EOG774804,INTERPRO:IPR026112,OrthoDB7_Insecta:EOG7G266G,OrthoDB7_Arthropoda:EOG7P65FW,OrthoDB7_Metazoa:EOG7ZGX2W,InterologFinder:33199,FlyAtlas:CG11592-RA,GenomeRNAi:33199;gbunit=AE014134;derived_computed_cyto=21B7-21B7'], ['2L', 'FlyBase', 'gene', '292419', '293222', '.', '+', '.', 'ID=FBgn0031247;Name=CG11562;Alias=FBgn0063011,BcDNA:RE44650;Ontology_term=SO:0000010,SO:0000087,GO:0005739,GO:0003674,GO:0008150;Dbxref=FlyBase:FBan0011562,FlyBase_Annotation_IDs:CG11562,GB_protein:AAF51513,GB:AI520524,GB:AI945841,GB:AY119645,GB_protein:AAM50299,GB:BE662187,GB:BI358003,UniProt/TrEMBL:Q9VPN3,OrthoDB7_Drosophila:EOG7HTW3H,OrthoDB7_Diptera:EOG7200K9,EntrezGene:33200,BDGP_clone:RE44650,OrthoDB7_Insecta:EOG7B9454,OrthoDB7_Arthropoda:EOG7RK278,OrthoDB7_Metazoa:EOG78H3X3,FlyAtlas:CG11562-RA,INTERPRO:IPR031568,Fly-FISH:CG11562,GenomeRNAi:33200;gbunit=AE014134;derived_computed_cyto=21B7-21B7'], ['2L', 'FlyBase', 'gene', '292959', '294681', '.', '-', '.', 'ID=FBgn0017457;Name=U2af38;fullname=U2 small nuclear riboprotein auxiliary factor 38;Alias=FBgn0010626,U2AF38,U2AF,dU2AF38,DU2AF38,CG3582,dU2AF[38],l(2)06751,u2af38,U2AF 38;Ontology_term=GO:0089701,SO:0000010,SO:0000087,GO:0000398,GO:0008187,GO:0005681,GO:0005686,GO:0000381,GO:0005634,GO:0003729,GO:0007052,GO:0071011,GO:0008380,GO:0000166,GO:0046872;Dbxref=FlyBase:FBan0003582,FlyBase_Annotation_IDs:CG3582,GB_protein:AAF51512,GB:AA264081,GB:AA820431,GB:AC004115,GB:AC008371,GB:AI061776,GB:AI455418,GB:AI944553,GB:AQ026079,GB:AY058537,GB_protein:AAL13766,GB:U67066,GB_protein:AAB17271,UniProt/Swiss-Prot:Q94535,INTERPRO:IPR000504,INTERPRO:IPR000571,INTERPRO:IPR009145,INTERPRO:IPR012677,GB_protein:AGB92351,UniProt/TrEMBL:M9PBM1,OrthoDB7_Drosophila:EOG7FRM2M,OrthoDB7_Diptera:EOG700KS6,EntrezGene:33201,BDGP_clone:LD24048,OrthoDB7_Insecta:EOG76QSHP,OrthoDB7_Arthropoda:EOG7KMJ7T,OrthoDB7_Metazoa:EOG70089G,apodroso:10448-U2af38[k14504],InterologFinder:33201,FlyAtlas:CG3582-RA,BIOGRID:59457,Fly-FISH:CG3582,GenomeRNAi:33201;gbunit=AE014134;derived_computed_cyto=21B7-21B8']]
+	#['2L', 'FlyBase', 'gene', '7529', '9484', '.', '+', '.', 'ID=FBgn0031208;Name=CG11023;Ontology_term=SO:0000010,SO:0000087,GO:0016929,GO:0016926;Dbxref=FlyBase:FBan0011023,FlyBase_Annotation_IDs:CG11023,GB_protein:ACZ94128,GB_protein:AAO41164,]
+	# ['2L', 'FlyBase', 'ncRNA', '286383', '288292', '.', '+', '.', 'ID=FBtr0347595;Name=CR46263-RA;Parent=FBgn0267996;Dbxref=FlyBase_Annotation_IDs:CR46263-RA;score_text=Weakly Supported;score=0'],
 
-
-def mel_ncRNA_list(list):
+def mel_ncRNA_strand(list): #2 function
 	"""This function takes the gff_list and makes an ncRNA_list"""
-	ncRNA = [] #initiates list
+	strand_dic = {} #initiates list
 	for i in list:
 		if i[2] == 'ncRNA':
-			preidRNA = i[8].split(';')[0]
-			#[ID=FBgn0031208];Name=CG11023;Ontology_term=SO:0000010,SO:0000087,GO:0016929,GO:0016926;Dbxref=FlyBase:FBan0011023,FlyBase_Annotation_IDs:CG11023,GB_protein:ACZ94128,GB_protein:AAO41164,GB:AI944728,GB:AJ564667,GB_protein:CAD92822,GB:BF495604,UniProt/TrEMBL:Q86BM6,INTERPRO:IPR003653,GB_protein:AGB92323,UniProt/TrEMBL:M9PAY1,OrthoDB7_Drosophila:EOG796K1P,OrthoDB7_Diptera:EOG7X1604,EntrezGene:33155,UniProt/TrEMBL:E1JHP8,UniProt/TrEMBL:Q6KEV3,OrthoDB7_Insecta:EOG7Q8QM7,OrthoDB7_Arthropoda:EOG7R5K68,OrthoDB7_Metazoa:EOG7D59MP,InterologFinder:33155,BIOGRID:59420,FlyAtlas:CG11023-RA,GenomeRNAi:33155;gbunit=AE014134;derived_computed_cyto=21A5-21A5'
-			ncRNA.append(preidRNA)
-	return ncRNA
-	#['ID=FBtr0309810', 'ID=FBtr0347585', 'ID=FBtr0345732', 'ID=FBtr0345733', 'ID=FBtr0344052', 'ID=FBtr0344053', 'ID=FBtr0344032', 'ID=FBtr0336836', 'ID=FBtr0336837', 'ID=FBtr0336984', 'ID=FBtr0336985', 'ID=FBtr0336986', 'ID=FBtr0336987', 'ID=FBtr0336988', 'ID=FBtr0347594', 'ID=FBtr0347595']
+			idRNA = i[8].split(';')[0].split('=')[1]
+			strand = i[6]
+			strand_dic[idRNA] = strand
+	return strand_dic
+	#'FBtr0344953': '-', 'FBtr0345411': '+', 'FBtr0345412': '-', 'FBtr0334097': '-',
 
-def mel_ncRNA_up_down_dict(rna_list, gff_list, window_length):
+def mel_ncRNA_chrom():
+	"""This has to read in the ncRNA fasta file, and find the chromosome name associated with the ncRNA"""
+	ncRNA_to_chrom_dict = {}
+	ncRNA = sys.argv[4]
+	with open(ncRNA, 'r') as n:
+		for line in n:
+			if line.startswith('>'):
+				data = line.strip().split(';')
+				ncRNA = data[0].split(' ')[0][1:]
+				chrom = data[1].split(':')[0]
+				ncRNA_to_chrom_dict[ncRNA]= chrom
+			else:
+				continue
+		return ncRNA_to_chrom_dict
+		#'FBtr0340236': ' loc=2L', 'FBtr0340585': ' loc=2L', 'FBtr0340584': ' loc=2L'
+
+
+def mel_ncRNA_up_down_dict(rna_chrom_dic, gff_list, window_length):
 	"""This function takes our two lists, ncRNA and gff_list and makes a dictionary. fbgn_id_dict where the key is ncRNA and the values are upstream genes and downstream genes. """
 	fbgn_id_dict = {}
-	for r in rna_list:
+	for k in rna_chrom_dic.iterkeys():
 		#print "This is r in rna_list", r
 		for i in gff_list:
-			data = i[8].split(';')[0]
-			if data == r:
+			data = i[8].split(';')[0].split('=')[1]
+			if data == k:
 				#print r, i #
 				#post_data = data.split('=')[1] # ex/ FBgn0031208
 				#ncRNA_gff_dict[post_data] = i[0], i[3], i[4]
@@ -55,8 +85,8 @@ def mel_ncRNA_up_down_dict(rna_list, gff_list, window_length):
 					counter = counter + 1
 					#this is how we can move backward
 					if gff_list[index-counter][2] == 'gene':
-						pre_info = gff_list[index-counter][8].split(';')[0]
-						info = pre_info.split('=')[1]
+						print gff_list[index-counter]
+						info = gff_list[index-counter][8].split(';')[0].split('=')[1]
 						upstream = upstream + 1
 						
 					else:
@@ -71,8 +101,7 @@ def mel_ncRNA_up_down_dict(rna_list, gff_list, window_length):
 					try:
 						test = gff_list[index+anticounter][2]
 						if gff_list[index+anticounter][2] == 'gene':
-							pre_info2 = gff_list[index+anticounter][8].split(';')[0]
-							info2 = pre_info2.split('=')[1]
+							info2 = gff_list[index+anticounter][8].split(';')[0].split('=')[1]
 							
 							downstream = downstream + 1
 						else:
@@ -83,12 +112,15 @@ def mel_ncRNA_up_down_dict(rna_list, gff_list, window_length):
 						
 					down.append(info2,)
 					
-				idRNA = r.split('=')[1]
+				idRNA = k
 				#"front-back-gene-id-dict"
-				fbgn_id_dict[idRNA] = (up, down)
+				fbgn_id_dict[idRNA] = [up, down]
+				#print fbgn_id_dict
+				#quit()
 	return fbgn_id_dict
 	#fbgn_id_dict
-	#{'FBtr0336987': (['FBgn0265149', 'FBgn0262252', 'FBgn0031235', 'FBgn0263465'], ['FBgn0022246', 'FBgn0031238', 'FBgn0031239', 'FBgn0265150']), 'FBtr0309810': (['FBgn0263584', 'FBgn0031209', 'FBgn0002121', 'FBgn0031208'], ['FBgn0051973', 'FBgn0267987', 'FBgn0266878', 'FBgn0266879']), 'FBtr0345733': (['FBgn0266879', 'FBgn0266878', 'FBgn0267987', 'FBgn0051973'], ['FBgn0067779', 'FBgn0266322', 'FBgn0031213', 'FBgn0031214']), 'FBtr0345732': (['FBgn0266878', 'FBgn0267987', 'FBgn0051973', 'FBgn0263584'], ['FBgn0266879', 'FBgn0067779', 'FBgn0266322', 'FBgn0031213']), 'FBtr0344053': (['FBgn0266322', 'FBgn0067779', 'FBgn0266879', 'FBgn0266878'], ['FBgn0031213', 'FBgn0031214', 'FBgn0002931', 'FBgn0031216']), 'FBtr0344052': (['FBgn0266322', 'FBgn0067779', 'FBgn0266879', 'FBgn0266878'], ['FBgn0031213', 'FBgn0031214', 'FBgn0002931', 'FBgn0031216']), 'FBtr0347585': (['FBgn0267987', 'FBgn0051973', 'FBgn0263584', 'FBgn0031209'], ['FBgn0266878', 'FBgn0266879', 'FBgn0067779', 'FBgn0266322']), 'FBtr0347595': (['FBgn0267996', 'FBgn0267995', 'FBgn0031245', 'FBgn0031244'], ['FBgn0025686', 'FBgn0031247', 'FBgn0017457']), 'FBtr0347594': (['FBgn0267995', 'FBgn0031245', 'FBgn0031244', 'FBgn0003444'], ['FBgn0267996', 'FBgn0025686', 'FBgn0031247', 'FBgn0017457']), 'FBtr0336988': (['FBgn0265150', 'FBgn0031239', 'FBgn0031238', 'FBgn0022246'], ['FBgn0031240', 'FBgn0086912', 'FBgn0086856', 'FBgn0086855']), 'FBtr0336984': (['FBgn0265151', 'FBgn0266557', 'FBgn0031233', 'FBgn0031232'], ['FBgn0265153', 'FBgn0265152', 'FBgn0263465', 'FBgn0031235']), 'FBtr0336985': (['FBgn0265153', 'FBgn0265151', 'FBgn0266557', 'FBgn0031233'], ['FBgn0265152', 'FBgn0263465', 'FBgn0031235', 'FBgn0262252']), 'FBtr0336986': (['FBgn0265152', 'FBgn0265153', 'FBgn0265151', 'FBgn0266557'], ['FBgn0263465', 'FBgn0031235', 'FBgn0262252', 'FBgn0265149']), 'FBtr0344032': (['FBgn0266304', 'FBgn0025683', 'FBgn0031220', 'FBgn0031219'], ['FBgn0001142', 'FBgn0265074', 'FBgn0265075', 'FBgn0051975']), 'FBtr0336836': (['FBgn0265074', 'FBgn0001142', 'FBgn0266304', 'FBgn0025683'], ['FBgn0265075', 'FBgn0051975', 'FBgn0051976', 'FBgn0051974']), 'FBtr0336837': (['FBgn0265075', 'FBgn0265074', 'FBgn0001142', 'FBgn0266304'], ['FBgn0051975', 'FBgn0051976', 'FBgn0051974', 'FBgn0031224'])}
+	#'FBtr0345733': [['FBgn0266879', 'FBgn0266878', 'FBgn0267987', 'FBgn0051973'], ['FBgn0067779', 'FBgn0266322', 'FBgn0031213', 'FBgn0031214']]
+	#{'FBtr0336987': (['FBgn0265149', 'FBgn0262252', 'FBgn0031235', 'FBgn0263465'], ['FBgn0022246', 'FBgn0031238', 'FBgn0031239', 'FBgn0265150']), 'FBtr0309810': (['FBgn0263584', 'FBgn0031209', 'FBgn0002121', 'FBgn0031208'], ['FBgn0051973', 'FBgn0267987', 'FBgn0266878', 'FBgn0266879']),}
 	
 def mel_gene_set(dict): # this uses the flanking genes, specifically
 	"""This function finds unique mel genes, and puts them in a set (what is returned), so we don't get the same coords twice. It takes fbgn_id_dict. This is so we have the mel genes that we need coordinates for in the non-mel species', ie we're using this to find the orthologs that we care about"""
@@ -110,82 +142,103 @@ def map_mel_gene_to_ortho_gene(set):
 			if not line.startswith('#') and not line.startswith('\n'):
 				data = line.split ('\t')
 				###switch this to "fly" sys.argv
-				if sys.argv[3] in data[6]:
-					if data[0] in mel_genes_obj:
-						#print data
+				if fly in data[6]:
+					if data[0] in set:
 						coord = data[8].split("..")
-						mapping[data[0]] = data[5], data[7], coord[0], coord[1]
-						#exit()
+						try:
+							if 'nonp' in mapping[data[0]]:
+								mapping[data[0]][data[5]] = [data[5], data[7], coord[0], coord[1]]
+						except KeyError:
+							mapping[data[0]]={}
+							mapping[data[0]]['nonp']= [data[5], data[7], coord[0], coord[1]]
+				
 	return mapping
 	# mapping ex/
-#FBgn0001142': ('FBgn0171629', 'scaffold_14', '131505', '132704'), 
-#'FBgn0002121': ('FBgn0171620', 'scaffold_14', '19278', '25107'), 
+	#'FBgn0085212': {'nonp': ['FBgn0167159', 'scaffold_3', '5320158', '5336608']}, 
+	#'FBgn0266101': {'FBgn0180013': ['FBgn0180013', 'scaffold_0', '1697815', '1706253'], 'nonp': ['FBgn0180014', 'scaffold_0', '1707282', '1708727']}	
 
 def ortho_up_down_dict(fbgn_id_dict, map):
 	"""This function maps the mel lncRNA to its upstream and downstream orthologs in a different species"""
 	rna_ortho = dict()
 	for k, v in fbgn_id_dict.iteritems():
 		before, after = [], []
+		code = []
 		for i, gene1 in enumerate(v[0]):
 			ortho_gene = map.get(gene1, None) # get returns a value for a given key
 			if ortho_gene is None:
+				code.append('0')
 				continue
 			if i <= window_length:
+				code.append('1')
 				before.append(ortho_gene)
 				
 		for i, gene2 in enumerate(v[1]):
 			ortho_gene = map.get(gene2, None)
 			if ortho_gene is None:
+				code.append('0')
 				continue
 			if i <= window_length:
+				code.append('1')
 				after.append(ortho_gene)
-		rna_ortho[k] = (before,after)
+		score =''.join(code)
+		rna_ortho[k] = [before,after, score] #from tuple to list
 	return rna_ortho
-	#'FBtr0344032': ([('FBgn0171613', 'scaffold_14', '122003', '129535'), ('FBgn0171614', 'scaffold_14', '115786', '118485')], [('FBgn0171629', 'scaffold_14', '131505', '132704'), ('FBgn0171610', 'scaffold_14', '138261', '139727')]), 
+#'FBtr0345411': [[], [{'nonp': ['FBgn0179621', 'scaffold_0', '3565044', '3567184']}], '00000100'], 'FBtr0345412': [[], [{'nonp': ['FBgn0179621', 'scaffold_0', '3565044', '3567184']}, {'nonp': ['FBgn0180128', 'scaffold_0', '3596896', '3597756']}], '00001001'], 'FBtr0334097': [[{'nonp': ['FBgn0179631', 'scaffold_0', '3361223', '3367367']}, {'nonp': ['FBgn0180115', 'scaffold_0', '3376393', '3378580']}],
 
 def ortho_final_coord(ortho_dict):#rna_ortho_dict,
 	"""This function finds the end of the front gene ortholog and the front of the back gene ortholog, to give a dictionary with a putative start and putative stop"""
+	###### dictionary of dictionaries? when there's two scaffolds that match, does it just overwrite? I think so. Double check this
 	final_coord_dict = dict()
 	for k, v in ortho_dict.iteritems():
 		upstream = v[0]
 		downstream = v[1]
 		uscafs = set()
 		dscafs = set()
-		for gene in upstream:
-			uscafs.add(gene[1])
-		for gene in downstream:
-			dscafs.add(gene[1])
+		for d in upstream:
+			for key, value in d.iteritems():
+				uscafs.add(d[key][1]) #scaffold
+		for e in downstream:
+			for key1, value1 in e.iteritems():
+				dscafs.add(e[key1][1])
 		common_scaf = uscafs.intersection(dscafs)
+
 		for x in common_scaf:
 			upos = []
-			for gene in upstream:
-				if gene[1] == x:
-					upos.append(gene[2])
-					upos.append(gene[3])
+			for d in upstream:
+				for key2, value2 in d.iteritems():
+					if d[key2][1] == x:
+						upos.append(d[key2][2])
+						upos.append(d[key2][3])
 			dpos = []
-			for gene in downstream:
-				if gene[1] == x:
-					dpos.append(gene[2])
-					dpos.append(gene[3])
-		#ex upos : ['3815439', '3822866', '3808823', '3809996']
-		#ex dbos : ['3823313', '3826021', '3826740', '3828621', '3829156', '3829994', '3831313', '3855168']
-		upos_num = [int(n) for n in upos]
-		dpos_num = [int(n) for n in dpos]
-		merged_pos = upos_num + dpos_num
-
-		final_coord_dict[k] = [x, min(merged_pos), max(merged_pos)]
-
-		
+			for e in downstream:
+				for key3, value3 in e.iteritems():
+					if e[key3][1] == x:
+						dpos.append(e[key3][2])
+						dpos.append(e[key3][3])
+			upos_num = [int(n) for n in upos]
+			dpos_num = [int(n) for n in dpos]
+			merged_pos = upos_num + dpos_num
+			try:
+				if x in final_coord_dict[k]:
+					print "It looks like this scaffold showed up twice", x
+				#final_coord_dict[k] = [x, min(merged_pos), max(merged_pos)]
+			except KeyError:
+				final_coord_dict[k] = {}
+				final_coord_dict[k][x] = [x, min(merged_pos), max(merged_pos)]
+		else:
+			continue
+	#print final_coord_dict
 	return final_coord_dict
-		#'FBtr0342867': ['scaffold_0', '3442611', '3447776'], 'FBtr0342862': ['scaffold_0', '3442611', '3447776']
+	#{'FBtr0344114': {'scaffold_39': ['scaffold_39', 318497, 337630]}, 'FBtr0345732': {'scaffold_14': ['scaffold_14', 31600, 75558]}, , 'FBtr0344645': {'scaffold_0': ['scaffold_0', 3565044, 3628549]}, 
 	
 def ortho_read_scaffolds():
-	"""Need to check this works"""
-	user_input = raw_input("Enter the path of the scaffold file: ")
-	assert os.path.exists(user_input), "I did not find the file at, "+str(user_input)
-	print ("Hooray we found your file!")
+	"""This reads in non-mel-species chromosome (err scaffold) file to make a dictionary of the key = name of scaffold and values of the scaffold sequence"""
+	#user_input = raw_input("Enter the path of the scaffold file: ")
+	#assert os.path.exists(user_input), "I did not find the file at, "+str(user_input)
+	#print ("Hooray we found your file!")
 	#print "I am in karl_read"
-	with open(user_input, 'r+') as species:
+	non_mel_scaff = sys.argv[5]
+	with open(non_mel_scaff, 'r+') as species:
 		key = ''
 		sequence = []
 		scaffold = dict()
@@ -201,8 +254,9 @@ def ortho_read_scaffolds():
 	return scaffold
 
 def mel_ncrna_seq_dict():
-	"""This reads in flybase file and makes a dictionary of ncRNA id (key) and sequence (value)"""
-	with open('flybase/dmel-all-ncRNA-r6.11.fasta', 'r+') as file:
+	"""This reads in flybase mel ncRNA file and makes a dictionary of ncRNA id (key) and sequence (value)"""
+	RNA_file = sys.argv[4]
+	with open(RNA_file, 'r+') as file:
 		key = ''
 		sequence = []
 		ncRNA = dict()
@@ -210,50 +264,274 @@ def mel_ncrna_seq_dict():
 			if line.startswith('>'):
 				if key and sequence:
 					ncRNA[key] = ''.join(sequence)
+				#print "This is line"
+				#print line
+				#>FBtr0076899 type=ncRNA; loc=3L:join(6976322..6977006,6977169..6977479,6977647..6979222); ID=FBtr0076899; name=CR32385-RA; dbxref=FlyBase:FBtr0076899,FlyBase_Annotation_IDs:CR32385-RA,REFSEQ:NR_001944,REFSEQ:NR_001944; score=9; score_text=Strongly Supported; MD5=25c515079ad37d428daae3062ba15e0c; length=2572; parent=FBgn0047205; release=r6.11; species=Dmel; 
 				key = line.split(' ')[0][1:]
 				sequence = []
 			else:
 				sequence.append(line.rstrip())
 		ncRNA[key] = ''.join(sequence)
 	return ncRNA
+
+def reverse_complement(strng):
+	"""This function returns the reverse complement of a string of nucleotides"""
+	#print "This is your starting string:"
+	#print type(strng)
+	reverse = strng[::-1]
+	#print "This is the reverse of your string"
+	#print reverse
+	complement = []
+	for i in reverse:
+		if i == 'a' or i == 'A':
+			complement.append('t')
+		if i == 't' or i == 'T':
+			complement.append('a')
+		if i == 'c' or i == 'C' :
+			complement.append('g')
+		if i == 'g' or i == 'G':
+			complement.append('c')
+	#print "This is the reverse complement"
+	#print complement
+	rev_com_str = ''.join(complement)
+	#print "This is the string rev com"
+	#print rev_com_str
+	return rev_com_str
+
+def merge_seq_and_strand(mel_seq_dic, strand_dic):
+	"""This function adds strandedness to important mel_seq_info"""
+	mel_complete = {}
+	for k,v in mel_seq_dic.iteritems():
+		try: ## remove this try/ except!!!!
+			strand = strand_dic[k]
+			mel_complete[k] = v, strand
+			#print mel_complete[k]
+			#print mel_complete[k][1]
+		except KeyError:
+			continue
+	#quit()
+	return mel_complete
+	#'FBtr0344953': ('ACAAATATACTTTGAAATCTTTTGGTCGCCAAATC...', '-')
 	
-def mel_ortho_output_sequence(scaf_dict, coord_dict, mel_seqs):
+def mel_ortho_output_sequence(scaf_dict, coord_dict, mel_seqs, mel_ud_dict):
 	"""This print the sequence of putative lncRNA in non-mel species, using start and stop and scaffold"""
 	#make out file to be written to
 	out_file = open('out_flybase_%s_ncRNA_mel_and_ortho_seq_%s.txt' %(fly, today), 'w')
 	for k, v in coord_dict.iteritems():
-		if v[1] < v[2]:
-			start = int(v[1])+1
-			end = int(v[2])+1
-		if v[2] < v[1]:
-			start = int(v[2])+1
-			end = int(v[1])+1
-		out_file.write(">%s;dmel\n%s\n" %(k, mel_seqs[k]))
-		out_file.write(">%s;%s\n%s\n" %(k, fly, scaf_dict[v[0]][start:end]))
+		#This is k: FBtr0344113
+		#This is v: {'scaffold_39': ['scaffold_39', 290730, 337630]}
+		#print "This is v:", v
+		#print "This is v[1]", v[1]
+		for l,w in v.iteritems():
+			#print "This is l", l
+			#print "This is w", w
+			if w[1] < w[2]:
+				start = int(w[1])+1
+				end = int(w[2])+1
+			if w[2] < w[1]:
+				start = int(w[2])+1
+				end = int(w[1])+1
+		if mel_seqs[k][1] == '+':
+			out_file.write(">%s;dmel;%s\n%s\n" %(k, '+', mel_seqs[k][0]))
+		if mel_seqs[k][1] == '-':
+			r_string = mel_seqs[k][0]
+			rev_com = reverse_complement(r_string)
+			#print "This is rev_com", rev_com
+			out_file.write(">%s;dmel;%s\n%s\n" %(k, '-', rev_com))
+		out_file.write(">%s:%s;%s;%s\n%s\n" %(k, l, fly, mel_ud_dict[k][2], scaf_dict[l][start:end]))
 	out_file.close()
+	
+def blast_coord(coord_dict):
+	"""This function will find all of the hits of dmel ncRNA against non-mel genome and return the best scaffold and the start and stop"""
+	file = sys.argv[6]
+	blast_coord_dict = dict()
+	final_blast_dict = dict()
+	with open(file, 'r') as f:
+		for line in f:
+			data= line.strip().split('\t')
+			if data[0] in blast_coord_dict:
+				blast_coord_dict[data[0]].append(data[1:])
+			else:
+				blast_coord_dict[data[0]]= [data[1:]]
+	
+	for k,v in blast_coord_dict.iteritems():
+		if k in coord_dict:
+			sstart = []
+			send = []
+			for list in v:
+				uscafs =set()
+				uscafs.add(list[0])
+				sstart.append(int(list[7]))
+				send.append(int(list[8]))
+			#here, since we are finding it compared to the lncRNA, we want more buffer, so the lowest and highest between up and down
+			scaf= [i for i in uscafs]
+			final_blast_dict[k] = scaf[0], min(sstart), max(send)
+	return blast_coord_dict, final_blast_dict
+
+
+def find_best_hit():
+	"""This reads in your protein blast output (in format 6) and gives you the data for the best hit per protein. Makes a dictionary."""
+	#print "In find_best_hit()"
+	blast_file = sys.argv[7]
+	protein_dict = {}
+	with open(blast_file, 'rU') as f:
+		for line in f:
+			data = line.strip().split('\t')
+			key = data[0]
+			if key in protein_dict:
+				if float(protein_dict[key][3]) < float(data[10]):
+					continue
+				if float(protein_dict[key][3])> float(data[10]):
+					protein_dict[key]= [data[1], data[8], data[9], data[10]]
+				if float(protein_dict[key][3]) == float(data[10]):
+					continue
+			else:
+				protein_dict[key]= [data[1], data[8], data[9], data[10]]
+	return protein_dict
+	#'FBpp0297216': ['scaffold_1', '11744116', '11743913', '1.05e-16'], 
+	#'FBpp0297217': ['scaffold_9', '2334999', '2335109', '5.05e-26'], 
+	#'FBpp0297219': ['scaffold_25', '588672', '588544', '3.43e-25']
+def match_pp_to_gn():
+	"""This has to read in the stupid protein files, and find the gn name associated with the protein"""
+	pp_to_gn_dict = {}
+	protein = sys.argv[8]
+	with open(protein, 'r') as p:
+		for line in p:
+			if line.startswith('>'):
+				data = line.strip().split(';')
+				pp = data[2].split('=')[1]
+				gn = data[4].split(',')[0].split('=')[1]
+				pp_to_gn_dict[pp]=gn
+			
+			else:
+				continue
+		return pp_to_gn_dict
+		#'FBpp0088107': 'FBgn0033139', 
+		#'FBpp0088104': 'FBgn0016032', 
+		#'FBpp0088105': 'FBgn0033135', 
+		#'FBpp0298338': 'FBgn0263113', 
+
+def dmelgn_to_ortho(p2g_dict, best_hit_dict): # 11_fun
+	"""This function takes pp_to_gn_dict and protein_dict and makes dmelgn_to_ortho_dict. It links the dmel gn to the best hit."""
+	dmelgn_to_ortho = {}
+	for k,v in best_hit_dict.iteritems():
+		#print "this is k", k
+		new_key = p2g_dict[k]
+		#print "This is new_key", new_key
+		dmelgn_to_ortho[new_key] = {}
+		dmelgn_to_ortho[new_key]['best_hit']= new_key, best_hit_dict[k][0],best_hit_dict[k][1], best_hit_dict[k][2]
+
+	return dmelgn_to_ortho# needs to be a dict of dict
+	#FBgn0032006': {'best_hit': ('FBgn0032006', 'scaffold_3', '3723783', '3722836')}
+
+def trouble_shoot(mel_ncRNA_dic, mel_ud_gn_dic, ortho_ud_gn_dic, ortho_final_coord, mel_prot_blast, mel_rna_blast):
+#(mel_ncRNA_chrom_obj,mel_ud_gn_dict_obj, ortho_ud_gn_dict, ortho_final_coord_obj, mel_to_ortho_prot_map, final_bls_dict)
+#prot_blast, rna_blast, obj1, obj2, 
+	"""This outputs a table that gives relevant troubleshooting info for each key (ncRNA gene)"""
+	trouble_out = open('out_troubleshoot_%s_ncRNA_flanking_genes_%s.txt' %(fly, today), 'w')
+	trouble_out.write("#ncRNA_id\t##ortho_found\t#mel_chrom\t#up_genes\t#down_genes\t#ortho_gene_score\t#flybase_ortho_scaffold\t#prot_ortho_scaffold\t#rna_ortho_scaffold\n")
+	#
+
+	for k,v in mel_ncRNA_dic.iteritems():
+
+		#out_file.write("%s\tncRNAbls:%s\tortho:%s\tprotbls:%s\n" %(k, final_bls_dict[k][0], ortho_final_coord_obj[k][0], new_ortho_final_coord_obj[k][0]))
+		mel_chrom = mel_ncRNA_dic[k]
+		if k in ortho_final_coord:
+			seqs= 'yes'
+		else:
+			seqs= 'no'
+		try:
+			up = mel_ud_gn_dic[k][0]
+			p_up = ';'.join(up)
+		except KeyError:
+			p_up = "KeyError"
+		try:
+			down = mel_ud_gn_dic[k][1]
+			p_down = ';'.join(down)
+		except KeyError:
+			p_down = "KeyError"
+		try:
+			score = ortho_ud_gn_dic[k][2]
+		except KeyError:
+			score = "KeyError"
+		fb_ortho_scaffs = []
+		try:
+			for v1 in ortho_final_coord[k]:
+				#print "This is v1", v1
+				fb_ortho_scaffs.append(v1)
+		except KeyError:
+			fb_ortho_scaffs.append("KeyError")
+		p_fb_ortho_scaffs = ';'.join(fb_ortho_scaffs)
+		try:		
+			
+			if mel_prot_blast[k]:
+				key_list=[]
+				for kay in mel_prot_blast[k].iterkeys():
+					#print kay
+					key_list.append(kay)
+					
+				prot_ortho_scaff = ';'.join(key_list)
+		except KeyError:
+			#'FBtr0343761': {'scaffold_10': ['scaffold_10', 2846888, 2975383]}
+			#print mel_prot_blast[k]
+			prot_ortho_scaff= "KeyError"
+		try:
+			rna_ortho_scaff = mel_rna_blast[k][0]
+		except KeyError:
+			rna_ortho_scaff= "KeyError"
+		trouble_out.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" %(k, seqs, mel_chrom, p_up, p_down, score, fb_ortho_scaffs, prot_ortho_scaff, rna_ortho_scaff))
+		#print k, mel_chrom, p_up, p_down, score, fb_ortho_scaffs, prot_ortho_scaff, rna_ortho_scaff
+		#       %s  %s  %s    %s  %s    %s     %s                  %s              %s
+		
+	trouble_out.close()
+	
+		
+		
+			
+		
+		
+		
+
+
 
 ### making sure the functions are executed in the right order
 mel_gff_obj = mel_gff_list()
-#print gff_obj
-mel_ncRNA_obj = mel_ncRNA_list(mel_gff_obj)
-#print ncRNA_obj
-mel_ud_gn_dict_obj =mel_ncRNA_up_down_dict(mel_ncRNA_obj, mel_gff_obj, window_length)
-#print fbgn_dict_obj
+
+mel_strand =mel_ncRNA_strand(mel_gff_obj)
+
+mel_ncRNA_chrom_obj = mel_ncRNA_chrom()
+
+mel_ud_gn_dict_obj =mel_ncRNA_up_down_dict(mel_ncRNA_chrom_obj, mel_gff_obj, window_length)
+
 mel_genes_obj = mel_gene_set(mel_ud_gn_dict_obj)
-#print mel_genes_obj
+
 ortho_map = map_mel_gene_to_ortho_gene(mel_genes_obj)
-#print ortho_map
+
 ortho_ud_gn_dict = ortho_up_down_dict(mel_ud_gn_dict_obj, ortho_map)
-#print rna_ortho_dict
-#python lncRNA_annotation_doc/step_by_step_flanking.py out/1_prac_ncRNA_and_genes.txt 
+
 ortho_final_coord_obj = ortho_final_coord(ortho_ud_gn_dict)
-#print final_coord_obj
+
 ortho_scaff_dict = ortho_read_scaffolds()
 
-mel_rna_seqs_obj = mel_ncrna_seq_dict()
+mel_rna_seqs_only = mel_ncrna_seq_dict()
 
-mel_ortho_output_sequence(ortho_scaff_dict, ortho_final_coord_obj, mel_rna_seqs_obj)
+mel_rna_seq_complete = merge_seq_and_strand(mel_rna_seqs_only, mel_strand)
 
-#flybase/dsec-all-chromosome-r1.3.fasta
+mel_ortho_output_sequence(ortho_scaff_dict, ortho_final_coord_obj, mel_rna_seq_complete, ortho_ud_gn_dict )
 
-#lncRNA_annotation_doc/flybase_flanking_genes.py out/1_dmel_genes_ncRNA_2016-06-07_out.txt flybase/gene_orthologs_fb_2016_03.tsv Dsec
+
+bls_dict, final_bls_dict =blast_coord(ortho_final_coord_obj) ##p1##  #8_fun(#7_obj)
+#8a_obj, #8b_obj
+pp_dict = find_best_hit() #9_fun
+#9_obj
+#print pp_dict
+prot_to_gene = match_pp_to_gn() #10_fun
+#10_obj
+#'FBpp0290552': 'FBgn0032006', 'FBpp0290553': 'FBgn0032006', 'FBpp0290550': 'FBgn0039932',
+mel_to_ortho_prot_map =dmelgn_to_ortho(prot_to_gene, pp_dict) #11_fun(#10_obj, #9_obj)
+
+new_ortho_ud_gn_dict = ortho_up_down_dict(mel_ud_gn_dict_obj, mel_to_ortho_prot_map)
+
+new_ortho_final_coord_obj = ortho_final_coord(new_ortho_ud_gn_dict) #7_fun(#6.2_obj)
+
+trouble_shoot(mel_ncRNA_chrom_obj,mel_ud_gn_dict_obj, ortho_ud_gn_dict, ortho_final_coord_obj, new_ortho_final_coord_obj, final_bls_dict)
