@@ -15,7 +15,7 @@ def parse_gff_nc_genes():
 
 	today = datetime.date.today()
 
-	ncRNA_gene_out = open('1_dmel_genes_ncRNA_%s_out.txt' %today, 'w')
+	ncRNA_gene_out = open('1_dmel_protein_ncRNA_%s_out.txt' %today, 'w')
 
 	f= open(gff3, 'r')
 
@@ -27,8 +27,8 @@ def parse_gff_nc_genes():
 			if True == True:
 	
 				try:
-		
-					if data[2] == 'gene':
+		#originally had this as 'gene', will now make it 'protein'
+					if data[2] == 'protein':
 						ncRNA_gene_out.write('%s' %line)
 			
 					elif data[2] == 'ncRNA':
