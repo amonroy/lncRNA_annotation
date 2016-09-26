@@ -7,7 +7,7 @@ today = datetime.date.today()
 window_length = 4
 fly = sys.argv[3]
 
-#"python lncRNA_annotation_doc/flybase_flanking_genes.py out/1_2_prac_ncRNA_and_genes.txt flybase/gene_orthologs_fb_2016_03.tsv Dsec flybase/dmel-all-ncRNA-r6.11.fasta flybase/dsec-all-chromosome-r1.3.fasta"
+#"python lncRNA_annotation_doc/flybase_flanking_genes.py out/1_dmel_protein_ncRNA_2016-08-22_out.txt flybase/gene_orthologs_fb_2016_03.tsv Dsec flybase/dmel-all-ncRNA-r6.11.fasta flybase/dsec-all-chromosome-r1.3.fasta"
 
 #sys.argv[1] = gff (modified)
 #sys.argv[2] = flybase ortholg file, "gene_orthologs_fb_2016_03.tsv"
@@ -84,8 +84,12 @@ def mel_ncRNA_up_down_dict(rna_chrom_dic, gff_list, window_length):
 					#print index
 					counter = counter + 1
 					#this is how we can move backward
-					if gff_list[index-counter][2] == 'gene':
-						print gff_list[index-counter]
+					#print gff_list[index-counter]
+					if gff_list[index-counter][2] == 'protein':
+						#print gff_list[index-counter][2]
+						#print gff_list[index-counter]
+						#quit()
+						#print gff_list[index-counter]
 						info = gff_list[index-counter][8].split(';')[0].split('=')[1]
 						upstream = upstream + 1
 						
@@ -100,7 +104,7 @@ def mel_ncRNA_up_down_dict(rna_chrom_dic, gff_list, window_length):
 					# the problem is that the last set of ncRNA downstream genes only goes to 3
 					try:
 						test = gff_list[index+anticounter][2]
-						if gff_list[index+anticounter][2] == 'gene':
+						if gff_list[index+anticounter][2] == 'protein':
 							info2 = gff_list[index+anticounter][8].split(';')[0].split('=')[1]
 							
 							downstream = downstream + 1
@@ -117,11 +121,33 @@ def mel_ncRNA_up_down_dict(rna_chrom_dic, gff_list, window_length):
 				fbgn_id_dict[idRNA] = [up, down]
 				#print fbgn_id_dict
 				#quit()
+	#print fbgn_id_dict
+	#'FBtr0343760': [['FBpp0311265', 'FBpp0074577', 'FBpp0074576', 'FBpp0311065'], ['FBpp0074565', 'FBpp0074566', 'FBpp0074575', 'FBpp0074573']], 
+	#'FBtr0343761': [['FBpp0305506', 'FBpp0305505', 'FBpp0070493', 'FBpp0070491'], ['FBpp0070495', 'FBpp0070496', 'FBpp0070511', 'FBpp0070494']], 
 	return fbgn_id_dict
 	#fbgn_id_dict
 	#'FBtr0345733': [['FBgn0266879', 'FBgn0266878', 'FBgn0267987', 'FBgn0051973'], ['FBgn0067779', 'FBgn0266322', 'FBgn0031213', 'FBgn0031214']]
 	#{'FBtr0336987': (['FBgn0265149', 'FBgn0262252', 'FBgn0031235', 'FBgn0263465'], ['FBgn0022246', 'FBgn0031238', 'FBgn0031239', 'FBgn0265150']), 'FBtr0309810': (['FBgn0263584', 'FBgn0031209', 'FBgn0002121', 'FBgn0031208'], ['FBgn0051973', 'FBgn0267987', 'FBgn0266878', 'FBgn0266879']),}
+
+def prot_to_gn(nc_pp_dic, pp_gn_dic):
+	new_dic = dict()
+	for k,v in nc_pp_dic.iteritems():
+		#print "This is v:", v
+		#print "This is v[0]:", v[0]
+		#print "This is v[1]:", v[1]
+		up_list = []
+		down_list = []
+		for i in v[0]:
+			new_up= pp_gn_dic[i]
+			up_list.append(new_up)
+		for j in v[1]:
+			new_down = pp_gn_dic[j]
+			down_list.append(new_down)
+		new_dic[k]= [up_list, down_list]
+	#print new_dic
+	return new_dic
 	
+
 def mel_gene_set(dict): # this uses the flanking genes, specifically
 	"""This function finds unique mel genes, and puts them in a set (what is returned), so we don't get the same coords twice. It takes fbgn_id_dict. This is so we have the mel genes that we need coordinates for in the non-mel species', ie we're using this to find the orthologs that we care about"""
 	mel_gene_set = set()
@@ -332,13 +358,13 @@ def mel_ortho_output_sequence(scaf_dict, coord_dict, mel_seqs, mel_ud_dict):
 				start = int(w[2])+1
 				end = int(w[1])+1
 		if mel_seqs[k][1] == '+':
-			out_file.write(">%s;dmel;%s\n%s\n" %(k, '+', mel_seqs[k][0]))
+			out_file.write(">%s;mel;%s\n%s\n" %(k, '+', mel_seqs[k][0]))
 		if mel_seqs[k][1] == '-':
 			r_string = mel_seqs[k][0]
 			rev_com = reverse_complement(r_string)
 			#print "This is rev_com", rev_com
 			out_file.write(">%s;dmel;%s\n%s\n" %(k, '-', rev_com))
-		out_file.write(">%s:%s;%s;%s\n%s\n" %(k, l, fly, mel_ud_dict[k][2], scaf_dict[l][start:end]))
+		out_file.write(">%s;%s;%s;%s\n%s\n" %(k, l, fly, mel_ud_dict[k][2], scaf_dict[l][start:end]))
 	out_file.close()
 	
 def blast_coord(coord_dict):
@@ -424,7 +450,7 @@ def dmelgn_to_ortho(p2g_dict, best_hit_dict): # 11_fun
 	return dmelgn_to_ortho# needs to be a dict of dict
 	#FBgn0032006': {'best_hit': ('FBgn0032006', 'scaffold_3', '3723783', '3722836')}
 
-def trouble_shoot(mel_ncRNA_dic, mel_ud_gn_dic, ortho_ud_gn_dic, ortho_final_coord, mel_prot_blast, mel_rna_blast):
+def trouble_shoot(mel_ncRNA_dic, mel_ud_gn_dic, ortho_ud_gn_dic, ortho_final_coord, mel_prot_blast, mel_rna_blast, mel_ud_pp_dic):
 #(mel_ncRNA_chrom_obj,mel_ud_gn_dict_obj, ortho_ud_gn_dict, ortho_final_coord_obj, mel_to_ortho_prot_map, final_bls_dict)
 #prot_blast, rna_blast, obj1, obj2, 
 	"""This outputs a table that gives relevant troubleshooting info for each key (ncRNA gene)"""
@@ -440,6 +466,17 @@ def trouble_shoot(mel_ncRNA_dic, mel_ud_gn_dic, ortho_ud_gn_dic, ortho_final_coo
 			seqs= 'yes'
 		else:
 			seqs= 'no'
+		try:
+			pup = mel_ud_pp_dic[k][0]
+			pp_up = ';'.join(pup)
+		except KeyError:
+			pp_up = "KeyError"
+		#print "pp_up:", pp_up
+		try:
+			pdown = mel_ud_pp_dic[k][1]
+			pp_down = ';'.join(pdown)
+		except KeyError:
+			pp_down = "KeyError"
 		try:
 			up = mel_ud_gn_dic[k][0]
 			p_up = ';'.join(up)
@@ -479,7 +516,7 @@ def trouble_shoot(mel_ncRNA_dic, mel_ud_gn_dic, ortho_ud_gn_dic, ortho_final_coo
 			rna_ortho_scaff = mel_rna_blast[k][0]
 		except KeyError:
 			rna_ortho_scaff= "KeyError"
-		trouble_out.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" %(k, seqs, mel_chrom, p_up, p_down, score, fb_ortho_scaffs, prot_ortho_scaff, rna_ortho_scaff))
+		trouble_out.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" %(k, seqs, mel_chrom, pp_up, pp_down, p_up, p_down, score, fb_ortho_scaffs, prot_ortho_scaff, rna_ortho_scaff))
 		#print k, mel_chrom, p_up, p_down, score, fb_ortho_scaffs, prot_ortho_scaff, rna_ortho_scaff
 		#       %s  %s  %s    %s  %s    %s     %s                  %s              %s
 		
@@ -501,7 +538,13 @@ mel_strand =mel_ncRNA_strand(mel_gff_obj)
 
 mel_ncRNA_chrom_obj = mel_ncRNA_chrom()
 
-mel_ud_gn_dict_obj =mel_ncRNA_up_down_dict(mel_ncRNA_chrom_obj, mel_gff_obj, window_length)
+mel_ud_pp_dict_obj = mel_ncRNA_up_down_dict(mel_ncRNA_chrom_obj, mel_gff_obj, window_length)
+
+prot_to_gene = match_pp_to_gn()
+
+mel_ud_gn_dict_obj = prot_to_gn(mel_ud_pp_dict_obj, prot_to_gene)
+
+##need an intermediate here where I replace the protein with a gn
 
 mel_genes_obj = mel_gene_set(mel_ud_gn_dict_obj)
 
@@ -525,7 +568,7 @@ bls_dict, final_bls_dict =blast_coord(ortho_final_coord_obj) ##p1##  #8_fun(#7_o
 pp_dict = find_best_hit() #9_fun
 #9_obj
 #print pp_dict
-prot_to_gene = match_pp_to_gn() #10_fun
+ #10_fun
 #10_obj
 #'FBpp0290552': 'FBgn0032006', 'FBpp0290553': 'FBgn0032006', 'FBpp0290550': 'FBgn0039932',
 mel_to_ortho_prot_map =dmelgn_to_ortho(prot_to_gene, pp_dict) #11_fun(#10_obj, #9_obj)
@@ -534,4 +577,4 @@ new_ortho_ud_gn_dict = ortho_up_down_dict(mel_ud_gn_dict_obj, mel_to_ortho_prot_
 
 new_ortho_final_coord_obj = ortho_final_coord(new_ortho_ud_gn_dict) #7_fun(#6.2_obj)
 
-trouble_shoot(mel_ncRNA_chrom_obj,mel_ud_gn_dict_obj, ortho_ud_gn_dict, ortho_final_coord_obj, new_ortho_final_coord_obj, final_bls_dict)
+trouble_shoot(mel_ncRNA_chrom_obj,mel_ud_gn_dict_obj, ortho_ud_gn_dict, ortho_final_coord_obj, new_ortho_final_coord_obj, final_bls_dict, mel_ud_pp_dict_obj)

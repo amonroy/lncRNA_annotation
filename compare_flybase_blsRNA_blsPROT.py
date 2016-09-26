@@ -29,7 +29,7 @@ def mel_ncRNA_list(list): #2 function
 	ncRNA = [] #initiates list
 	for i in list:
 		if i[2] == 'ncRNA':
-			preidRNA = i[8].split(';')[0]
+			preidRNA = i[8].split(';')[0].split('=')[1]
 			ncRNA.append(preidRNA)
 	return ncRNA
 	#['ID=FBtr0309810', 'ID=FBtr0347585', 'ID=FBtr0345732', 'ID=FBtr0345733', 'ID=FBtr0344052']
@@ -38,8 +38,12 @@ def mel_ncRNA_up_down_dict(rna_list, gff_list, window_length): #3 function
 	"""This function takes our two lists, ncRNA and gff_list and makes a dictionary. mel_ncRNA_up_down_dict where the key is ncRNA and the values are upstream genes and downstream genes. """
 	up_down_dict = {}
 	for r in rna_list:
+		print r
+		#ID=FBtr0309810
 		for i in gff_list:
-			data = i[8].split(';')[0]
+			data = i[8].split(';')[0].split('=')[1]
+			print data
+			quit()
 			if data == r:
 				index = gff_list.index(i)# indexing so more efficient to move backward
 				upstream = 0
@@ -284,6 +288,7 @@ def mel_ncRNA_chrom():
 			else:
 				continue
 		return ncRNA_to_chrom_dict
+		#'FBtr0340236': ' loc=2L', 'FBtr0340585': ' loc=2L', 'FBtr0340584': ' loc=2L'
 
 
 mel_gff_obj = mel_gff_list() #1_fun
@@ -326,8 +331,6 @@ new_ortho_ud_gn_dict = ortho_up_down_dict(mel_ud_gn_dict_obj, mel_to_ortho_map) 
 new_ortho_final_coord_obj = ortho_final_coord(new_ortho_ud_gn_dict) #7_fun(#6.2_obj)
 ncRNA_chrom =mel_ncRNA_chrom() #12_fun
 #12_obj
-
-
 
 
 ## 8a and 8b are used mostly here
