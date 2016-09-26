@@ -4,7 +4,7 @@ import datetime
 #argv[1] should be the gff3 file, latest release "dmel-all-r6.11.gff.gz" 
 #on ftp://ftp.flybase.net/genomes/Drosophila_melanogaster/current/gff/
 #input is gff file
-#output is gff-like file, but with only the lines concerning 'ncRNA' or 'genes'
+#output is gff-like file, but with only the lines concerning 'ncRNA' or 'protein'
 
 def parse_gff_nc_genes():
 	"""This function takes the Dmel gff file from argv[1] and parses it. 
