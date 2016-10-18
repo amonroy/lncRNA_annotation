@@ -93,12 +93,12 @@ def mel_ncRNA_up_down_dict(rna_chrom_dic, gff_list, window_length):
 						#print gff_list[index-counter][3]
 						#print gff_list[index-counter][4]
 						info = gff_list[index-counter][8].split(';')[0].split('=')[1]
-						info_list = [gff_list[index-counter][3], gff_list[index-counter][4]]
+						#info_list = [gff_list[index-counter][3], gff_list[index-counter][4]]
 						#print "This is info", info
 						#print "This is info_list", info_list
 						#This is info FBpp0309212
-						prot_dict = {}
-						prot_dict[info] = info_list
+						#prot_dict = {}
+						#prot_dict[info] = info_list
 						#print prot_dict
 						#quit()
 						upstream = upstream + 1
@@ -106,7 +106,7 @@ def mel_ncRNA_up_down_dict(rna_chrom_dic, gff_list, window_length):
 					else:
 					   continue
 					   
-					up.append(prot_dict,)
+					up.append(info,)
 					
 				while downstream < window_length:
 					#adding one for each iteration
