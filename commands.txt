@@ -1,0 +1,8 @@
+# to run my script, this is the current (as of 9/27/2016) command
+python lncRNA_annotation_doc/flybase_flanking_genes.py out/1_dmel_protein_ncRNA_2016-08-22_out.txt flybase/gene_orthologs_fb_2016_03.tsv Dsim flybase/dmel-all-ncRNA-r6.11.fasta flybase/dsim-all-chromosome-r2.02.fasta out/dmel-on-dsim-2.blstn out/tblstn-dmel-on-dsim.tblstn flybase/dmel-all-translation-r6.11.fasta
+
+#note, need blast of tblstn-dmel-on-d???.tblstn and blast of dmel-on-d???.blstn
+# also need d???-all-chromosome-?*.fasta 
+
+
+

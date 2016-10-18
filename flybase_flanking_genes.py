@@ -8,7 +8,7 @@ window_length = 4
 fly = sys.argv[3]
 
 #"python lncRNA_annotation_doc/flybase_flanking_genes.py out/1_dmel_protein_ncRNA_2016-08-22_out.txt flybase/gene_orthologs_fb_2016_03.tsv Dsec flybase/dmel-all-ncRNA-r6.11.fasta flybase/dsec-all-chromosome-r1.3.fasta"
-
+#python lncRNA_annotation_doc/flybase_flanking_genes.py out/1_dmel_protein_ncRNA_2016-08-22_out.txt flybase/gene_orthologs_fb_2016_03.tsv Dsim flybase/dmel-all-ncRNA-r6.11.fasta flybase/dsim-all-chromosome-r2.02.fasta out/dmel-on-dsim-2.blstn out/tblstn-dmel-on-dsim.tblstn flybase/dmel-all-translation-r6.11.fasta
 #sys.argv[1] = gff (modified)
 #sys.argv[2] = flybase ortholg file, "gene_orthologs_fb_2016_03.tsv"
 #sys.argv[3] = fly name (ie Dsec, Dyak, ...)
@@ -90,13 +90,23 @@ def mel_ncRNA_up_down_dict(rna_chrom_dic, gff_list, window_length):
 						#print gff_list[index-counter]
 						#quit()
 						#print gff_list[index-counter]
+						#print gff_list[index-counter][3]
+						#print gff_list[index-counter][4]
 						info = gff_list[index-counter][8].split(';')[0].split('=')[1]
+						info_list = [gff_list[index-counter][3], gff_list[index-counter][4]]
+						#print "This is info", info
+						#print "This is info_list", info_list
+						#This is info FBpp0309212
+						prot_dict = {}
+						prot_dict[info] = info_list
+						#print prot_dict
+						#quit()
 						upstream = upstream + 1
 						
 					else:
 					   continue
 					   
-					up.append(info,)
+					up.append(prot_dict,)
 					
 				while downstream < window_length:
 					#adding one for each iteration
@@ -119,8 +129,8 @@ def mel_ncRNA_up_down_dict(rna_chrom_dic, gff_list, window_length):
 				idRNA = k
 				#"front-back-gene-id-dict"
 				fbgn_id_dict[idRNA] = [up, down]
-				#print fbgn_id_dict
-				#quit()
+				print fbgn_id_dict
+				quit()
 	#print fbgn_id_dict
 	#'FBtr0343760': [['FBpp0311265', 'FBpp0074577', 'FBpp0074576', 'FBpp0311065'], ['FBpp0074565', 'FBpp0074566', 'FBpp0074575', 'FBpp0074573']], 
 	#'FBtr0343761': [['FBpp0305506', 'FBpp0305505', 'FBpp0070493', 'FBpp0070491'], ['FBpp0070495', 'FBpp0070496', 'FBpp0070511', 'FBpp0070494']], 
