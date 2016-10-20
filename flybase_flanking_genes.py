@@ -1,7 +1,12 @@
+
+### this is my working document for my current homolog search project
+
+
 import sys
 import datetime
 import itertools
 import os
+
 
 today = datetime.date.today()
 window_length = 4
@@ -32,6 +37,18 @@ def mel_gff_list():
 	#gff_list ex/:
 	#['2L', 'FlyBase', 'gene', '7529', '9484', '.', '+', '.', 'ID=FBgn0031208;Name=CG11023;Ontology_term=SO:0000010,SO:0000087,GO:0016929,GO:0016926;Dbxref=FlyBase:FBan0011023,FlyBase_Annotation_IDs:CG11023,GB_protein:ACZ94128,GB_protein:AAO41164,]
 	# ['2L', 'FlyBase', 'ncRNA', '286383', '288292', '.', '+', '.', 'ID=FBtr0347595;Name=CR46263-RA;Parent=FBgn0267996;Dbxref=FlyBase_Annotation_IDs:CR46263-RA;score_text=Weakly Supported;score=0'],
+
+def make_start_dictionary(list):
+	"""This function makes a dictionary using the start location as a key and the name as the entry."""
+	start_dict = {}
+	for i in list:
+		start = i[3]
+		name = i[8].split(';')[0].split('=')[1]
+		#print "This is start", start
+		#print "this is name", name
+		start_dict.setdefault(start,[]).append(name)
+	#print start_dict
+	return start_dict
 
 def mel_ncRNA_strand(list): #2 function
 	"""This function takes the gff_list and makes an ncRNA_list"""
@@ -543,6 +560,8 @@ def trouble_shoot(mel_ncRNA_dic, mel_ud_gn_dic, ortho_ud_gn_dic, ortho_final_coo
 
 ### making sure the functions are executed in the right order
 mel_gff_obj = mel_gff_list()
+
+mel_loc_dictionary = make_start_dictionary(mel_gff_obj)
 
 mel_strand =mel_ncRNA_strand(mel_gff_obj)
 
