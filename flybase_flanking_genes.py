@@ -6,6 +6,7 @@ import sys
 import datetime
 import itertools
 import os
+import re
 
 
 today = datetime.date.today()
@@ -42,12 +43,21 @@ def make_start_dictionary(list):
 	"""This function makes a dictionary using the start location as a key and the name as the entry."""
 	start_dict = {}
 	for i in list:
+		#if i[2] == 'protein':
 		start = i[3]
 		name = i[8].split(';')[0].split('=')[1]
 		#print "This is start", start
 		#print "this is name", name
 		start_dict.setdefault(start,[]).append(name)
+		#else:
+			#continue
 	#print start_dict
+	#'14659561': ['FBpp0082426', 'FBpp0082427'], '7438647': ['FBpp0289592'], '13862097': ['FBpp0086712', 'FBpp0308975'], '25477102': ['FBpp0084211'], '17407882': ['FBpp0082878'], 
+#'17799003': ['FBpp0082952', 'FBpp0312514'], '11167232': ['FBpp0075947', 'FBpp0075948'], 
+#'334286': ['FBpp0297520'], '18554336': ['FBpp0289650', 'FBpp0309333'], '1108701': ['FBpp0077619'], '5139745': ['FBpp0076869'], 
+#'7518900': ['FBpp0081076'], '6040702': ['FBpp0293888', 'FBpp0293889'], 
+#'12379652': ['FBpp0087067'], '13974233': ['FBpp0080188', 'FBpp0301776', 'FBpp0310237'],
+	#quit()
 	return start_dict
 
 def mel_ncRNA_strand(list): #2 function
@@ -55,9 +65,14 @@ def mel_ncRNA_strand(list): #2 function
 	strand_dic = {} #initiates list
 	for i in list:
 		if i[2] == 'ncRNA':
+			#print i
+			#quit()
 			idRNA = i[8].split(';')[0].split('=')[1]
 			strand = i[6]
-			strand_dic[idRNA] = strand
+			start = i[3]
+			strand_dic[idRNA] = [strand, start]
+			
+	#print strand_dic
 	return strand_dic
 	#'FBtr0344953': '-', 'FBtr0345411': '+', 'FBtr0345412': '-', 'FBtr0334097': '-',
 
@@ -69,8 +84,10 @@ def mel_ncRNA_chrom():
 		for line in n:
 			if line.startswith('>'):
 				data = line.strip().split(';')
+				#print data
+				#quit()
 				ncRNA = data[0].split(' ')[0][1:]
-				chrom = data[1].split(':')[0]
+				chrom = [data[1].split(':')[0]]
 				ncRNA_to_chrom_dict[ncRNA]= chrom
 			else:
 				continue
@@ -78,6 +95,115 @@ def mel_ncRNA_chrom():
 		#'FBtr0340236': ' loc=2L', 'FBtr0340585': ' loc=2L', 'FBtr0340584': ' loc=2L'
 
 
+def indexing_location(rna_strand_dic,location_dic, window_length):
+	"""This function is going to make a dictionary with upstream genes and downstream genes for each lncRNA"""
+	print "I am in indexing"
+	#location_dic '14659561': ['FBpp0082426', 'FBpp0082427'], '7438647': ['FBpp0289592']
+	fbgn_id_dict = {}
+	sorted_starts = sorted(location_dic.keys()) #making an ordered list of the key in location_dic
+	#print "length of sorted_starts", len(sorted_starts) # = 18651
+	for k,v in rna_strand_dic.iteritems():
+		#print "This is k, v[1]:", k, v[1]# FBtr0340236  loc=2L
+		#get the index of the lncRNA
+		rna_index = sorted_starts.index(v[1]) #finds the index in sorted_starts of rna currently on ... k is whatever, but v[1] is the start location of that k
+		up_counter = 1
+		down_counter = 1
+		uplist, downlist = [], []
+		#match = 
+		#'FBpp"
+		while len(uplist) < window_length: #this is counting how many genes we've found
+			#up_counter = up_counter + 1 #this is counting the index
+		#for i in range(rna_index - window_length, rna_index): #upstream
+			#print location_dic.get(sorted_starts[i])
+			try:
+				#print location_dic.get(sorted_starts[i])[0] #type = list
+				#print location_dic.get(sorted_starts[rna_index - up_counter])
+				#['FBpp0312346']
+				#quit()
+			#v_up = len(location_dic.get(sorted_starts[rna_index - up_counter])) -1  #this is counting the length of the value list in dic
+				#print v_up
+			#while v_up > 0:
+			#	print location_dic.get(sorted_starts[rna_index - up_counter][v_up])
+					#['FBpp0312346']
+				for i in location_dic.get(sorted_starts[rna_index - up_counter]):
+					match = re.search("FBpp*", i)
+					if match:
+						#print "Match:", i
+						uplist.append(i)
+						up_counter += 1
+						break
+					elif not match:
+						print "no match:", location_dic.get(i)
+						up_counter += 1
+						break	
+					else:
+						print "No, I am here... why????"
+						#up_counter += 1
+						break
+			except IndexError:
+				print "This number gave me a problem", rna_index- up_counter
+				#gets stuck at 18649, length of sorted starts = 18651
+				break
+				#up_counter += 1
+		#print "This is uplist", uplist
+		while len(downlist) < window_length:
+			try:
+				#print location_dic.get(sorted_starts[rna_index + down_counter])
+				for i in location_dic.get(sorted_starts[rna_index - down_counter]):
+					match = re.search("FBpp*", i)
+					if match:
+						#print "Match:", i
+						downlist.append(i)
+						down_counter += 1
+						break
+					elif not match:
+						#print "no match:", location_dic.get(i)
+						down_counter += 1
+						break	
+					else:
+						print "No, I am here... why????"
+						#up_counter += 1
+						break
+			except IndexError:
+				print "This number gave me a problem", rna_index- down_counter
+				break
+		fbgn_id_dict[k]=uplist, downlist
+	#print len(fbgn_id_dict)
+	#print fbgn_id_dict
+	print len(fbgn_id_dict)
+	for k,v in fbgn_id_dict.iteritems():
+		if len(v[0]) < 4:
+			print k , v
+			print rna_strand_dic[k][1]
+			search = rna_strand_dic[k][1]
+			unknown =sorted_starts.index(search)
+			print unknown
+					
+		if len(v[1]) < 4:
+			print k, v
+			print rna_strand_dic[k][1]
+			search = rna_strand_dic[k][1]
+			unknown =sorted_starts.index(search)
+			print unknown
+			#except IndexError:
+			#	print "There was an indexerror"
+			#	continue
+		
+		#quit()
+		#for i in range( (rna_index + 1), rna_index + (window_length + 1)): #downstream
+		#s	try:
+				#print location_dic.get(sorted_starts[i])[0]
+		#		downlist.append(location_dic.get(sorted_starts[i])[0])
+		#	except IndexError:
+		#		continue
+		#fbgn_id_dict[k]=uplist, downlist
+		#'FBtr0343766': (['FBpp0112245', 'FBtr0346835', 'FBpp0082602', 'FBpp0075299'], ['FBpp0075301', 'FBpp0075302', 'FBpp0080297', 'FBpp0271810']), 
+		#'FBtr0343760': (['FBpp0083204', 'FBpp0085644', 'FBpp0083205', 'FBtr0345374'], ['FBpp0088212', 'FBpp0080829', 'FBpp0080849', 'FBpp0304540']), 
+		#'FBtr0343761': (['FBpp0312349', 'FBpp0088246', 'FBpp0077268', 'FBpp0303136'], ['FBpp0112952', 'FBpp0070495', 'FBpp0070496', 'FBpp0072923']), 
+		#'FBtr0343762': (['FBtr0347071', 'FBpp0083564', 'FBpp0083562', 'FBpp0085263'], ['FBpp0303394', 'FBpp0083559', 'FBpp0071659', 'FBpp0070372'])
+	return fbgn_id_dict
+	#quit()
+	
 def mel_ncRNA_up_down_dict(rna_chrom_dic, gff_list, window_length):
 	"""This function takes our two lists, ncRNA and gff_list and makes a dictionary. fbgn_id_dict where the key is ncRNA and the values are upstream genes and downstream genes. """
 	fbgn_id_dict = {}
@@ -146,8 +272,8 @@ def mel_ncRNA_up_down_dict(rna_chrom_dic, gff_list, window_length):
 				idRNA = k
 				#"front-back-gene-id-dict"
 				fbgn_id_dict[idRNA] = [up, down]
-				print fbgn_id_dict
-				quit()
+				#print fbgn_id_dict
+				#quit()
 	#print fbgn_id_dict
 	#'FBtr0343760': [['FBpp0311265', 'FBpp0074577', 'FBpp0074576', 'FBpp0311065'], ['FBpp0074565', 'FBpp0074566', 'FBpp0074575', 'FBpp0074573']], 
 	#'FBtr0343761': [['FBpp0305506', 'FBpp0305505', 'FBpp0070493', 'FBpp0070491'], ['FBpp0070495', 'FBpp0070496', 'FBpp0070511', 'FBpp0070494']], 
@@ -171,7 +297,8 @@ def prot_to_gn(nc_pp_dic, pp_gn_dic):
 			new_down = pp_gn_dic[j]
 			down_list.append(new_down)
 		new_dic[k]= [up_list, down_list]
-	#print new_dic
+	print new_dic
+	#'FBtr0347262': [['FBgn0011766', 'FBgn0011766', 'FBgn0011766', 'FBgn0011766'], ['FBgn0038893', 'FBgn0038894', 'FBgn0259113', 'FBgn0051176']], 
 	return new_dic
 	
 
@@ -567,7 +694,9 @@ mel_strand =mel_ncRNA_strand(mel_gff_obj)
 
 mel_ncRNA_chrom_obj = mel_ncRNA_chrom()
 
-mel_ud_pp_dict_obj = mel_ncRNA_up_down_dict(mel_ncRNA_chrom_obj, mel_gff_obj, window_length)
+mel_ud_pp_dict_obj = indexing_location(mel_strand,mel_loc_dictionary, window_length)
+
+#mel_ud_pp_dict_obj = mel_ncRNA_up_down_dict(mel_ncRNA_chrom_obj, mel_gff_obj, window_length)
 
 prot_to_gene = match_pp_to_gn()
 
