@@ -609,9 +609,9 @@ def trouble_shoot(mel_ncRNA_dic, mel_ud_gn_dic, ortho_ud_gn_dic, ortho_final_coo
 #prot_blast, rna_blast, obj1, obj2, 
 	"""This outputs a table that gives relevant troubleshooting info for each key (ncRNA gene)"""
 	trouble_out = open('out_troubleshoot_%s_ncRNA_flanking_genes_%s.txt' %(fly, today), 'w')
-	trouble_out.write("#ncRNA_id\t##ortho_found\t#mel_chrom\t#up_genes\t#down_genes\t#ortho_gene_score\t#flybase_ortho_scaffold\t#prot_ortho_scaffold\t#rna_ortho_scaffold\n")
-	#
-
+	trouble_out.write("#ncRNA_id\t#ortho_found\t#mel_chrom\t#up_proteins\t#down_proteins\t#up_genes\t#down_genes\t#ortho_gene_score\t#flybase_ortho_scaffold\t#prot_ortho_scaffold\t#rna_ortho_scaffold\n")
+                            #k,         seqs, mel_chrom,    pp_up,     pp_down, p_up, p_down, score,        fb_ortho_scaffs,       prot_ortho_scaff,       rna_ortho_scaff)
+##ncRNA_id	##ortho_found	#mel_chrom	#up_proteins	#down_proteins	#up_genes	#down_genes	#ortho_gene_score	#flybase_ortho_scaffold	#prot_ortho_scaffold	#rna_ortho_scaffold
 	for k,v in mel_ncRNA_dic.iteritems():
 
 		#out_file.write("%s\tncRNAbls:%s\tortho:%s\tprotbls:%s\n" %(k, final_bls_dict[k][0], ortho_final_coord_obj[k][0], new_ortho_final_coord_obj[k][0]))
